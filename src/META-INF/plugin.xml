@@ -1,0 +1,26 @@
+<idea-plugin version="2">
+  <id>org.nik.presentation-assistant</id>
+  <name>Presentation Assistant</name>
+  <version>0.2</version>
+  <vendor>Nikolay Chashnikov</vendor>
+
+  <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (Settings | Presentation Assistant) ]]></description>
+
+
+  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
+  <idea-version since-build="107.105"/>
+
+  <depends>com.intellij.modules.lang</depends>
+
+  <actions>
+    <!-- Add your actions here -->
+  </actions>
+  <application-components>
+      <component>
+          <implementation-class>org.nik.presentationAssistant.PresentationAssistant</implementation-class>
+      </component>
+  </application-components>
+  <extensions defaultExtensionNs="com.intellij">
+      <applicationConfigurable instance="org.nik.presentationAssistant.PresentationAssistantConfigurable"/>
+  </extensions>
+</idea-plugin>
