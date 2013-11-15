@@ -20,8 +20,10 @@ import com.intellij.openapi.actionSystem.KeyboardShortcut
 import javax.swing.KeyStroke
 import java.awt.event.KeyEvent
 import com.intellij.openapi.keymap.MacKeymapUtil
-import com.intellij.openapi.keymap.KeymapUtil
 import org.nik.presentationAssistant.ShortcutPresenter.KeymapKind
+import java.awt.Font
+import java.util.ArrayList
+import com.intellij.openapi.util.SystemInfo
 
 public class ShortcutPresenter() : Disposable {
     private val movingActions = setOf(
@@ -100,6 +102,7 @@ public class ShortcutPresenter() : Disposable {
         val macShortcut = shortcutText(macKeymap?.getShortcuts(actionId), KeymapKind.MAC)
         val parentGroupName = parentNames[actionId]
         val actionText = (if (parentGroupName != null) "$parentGroupName ${MacKeymapUtil.RIGHT} " else "") + (event.getPresentation().getText() ?: "").trimTrailing("...")
+        val fragments = ArrayList<Pair<String, Font?>>()
         val content = StringBuilder()
         if (actionText.length > 0) {
             content.append("<b>${actionText}</b>")
@@ -109,14 +112,31 @@ public class ShortcutPresenter() : Disposable {
             content.append(winShortcut)
         }
         if (macShortcut.length > 0 && macShortcut != winShortcut) {
-            content.append(" ($macShortcut for Mac)")
+            when {
+                SystemInfo.isMac -> content.append(" ($macShortcut for Mac)")
+                macKeyStokesFont != null && macKeyStokesFont!!.canDisplayUpTo(macShortcut) == -1 -> {
+                    content.append(" (")
+                    fragments.add(Pair(content.toString(), null))
+                    fragments.add(Pair(macShortcut, macKeyStokesFont))
+                    fragments.add(Pair("&nbsp;for Mac)", null))
+                }
+                else -> {
+                    val macShortcutAsWin = shortcutText(macKeymap?.getShortcuts(actionId), KeymapKind.WIN)
+                    if (macShortcutAsWin.length > 0 && macShortcutAsWin != winShortcut) {
+                        content.append(" ($macShortcutAsWin for Mac)")
+                    }
+                }
+            }
+        }
+        if (fragments.empty) {
+            fragments.add(Pair(content.toString(), null))
         }
         if (infoPanel != null) {
             Disposer.dispose(infoPanel!!)
         }
         val project = event.getProject() ?: ProjectManager.getInstance()!!.getOpenProjects().find { true }
         if (project != null) {
-            infoPanel = ActionInfoPanel(project, content.toString())
+            infoPanel = ActionInfoPanel(project, fragments)
         }
     }
 
@@ -135,7 +155,7 @@ public class ShortcutPresenter() : Disposable {
 
     private fun shortcutText(keystroke: KeyStroke, keymapKind: KeymapKind) =
         when (keymapKind) {
-            KeymapKind.MAC -> KeymapUtil.getKeystrokeText(keystroke) ?: ""
+            KeymapKind.MAC -> MacKeymapUtil.getKeyStrokeText(keystroke) ?: ""
             KeymapKind.WIN -> {
                 val modifiers = keystroke.getModifiers()
                 val tokens = array(
