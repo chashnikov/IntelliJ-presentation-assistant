@@ -175,8 +175,8 @@ public class ShortcutPresenter() : Disposable {
             KeymapKind.WIN -> {
                 val modifiers = keystroke.getModifiers()
                 val tokens = array(
-                   if (modifiers > 0) KeyEvent.getKeyModifiersText(modifiers) else null,
-                   KeyEvent.getKeyText(keystroke.getKeyCode())
+                   if (modifiers > 0) getWinModifiersText(modifiers) else null,
+                   getWinKeyText(keystroke.getKeyCode())
                 )
                 tokens.filterNotNull().filter {it.isNotEmpty()}.makeString(separator = "+").trim()
             }
