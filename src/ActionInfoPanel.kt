@@ -10,7 +10,6 @@ import java.awt.Point
 import com.intellij.openapi.Disposable
 import java.awt.Color
 import com.intellij.ui.JBColor
-import javax.swing.BorderFactory
 import java.awt.BorderLayout
 import com.intellij.ui.components.panels.NonOpaquePanel
 import java.awt.Font
@@ -21,10 +20,14 @@ import javax.swing.JLabel
 import javax.swing.SwingConstants
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.util.Pair as IdeaPair
-import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
 import java.awt.event.ActionListener
 import javax.swing.SwingUtilities
+import com.intellij.ui.popup.ComponentPopupBuilderImpl
+import java.awt.geom.RoundRectangle2D
+import javax.swing.BorderFactory
+import javax.swing.KeyStroke
+import java.awt.event.KeyEvent
+import com.intellij.ui.IdeBorderFactory
 
 class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>) : NonOpaquePanel(BorderLayout()), Disposable {
     private val hint: JBPopup
@@ -39,14 +42,15 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         setBackground(background)
         setOpaque(true)
         add(labelsPanel, BorderLayout.CENTER)
-        setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5))
+        setBorder(BorderFactory.createCompoundBorder(IdeBorderFactory.createRoundedBorder(20), BorderFactory.createEmptyBorder(5,5,5,5)))
 
         val cancelListener = IdeaPair(ActionListener {
             //this seems to be the simplest way to cancel the hint on Esc and don't consume the Esc event
             SwingUtilities.invokeLater { hint.cancel() }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0))
-        hint = with (JBPopupFactory.getInstance()!!.createComponentPopupBuilder(this, this)) {
+        hint = with (JBPopupFactory.getInstance()!!.createComponentPopupBuilder(this, this) as ComponentPopupBuilderImpl) {
             setAlpha(0.2)
+            setMaskProvider { RoundRectangle2D.Double(1.0, 1.0, it!!.getWidth()-2, it.getHeight()-2, 20.0, 20.0) }
             setFocusable(false)
             setCancelKeyEnabled(false)
             setKeyboardActions(arrayListOf(cancelListener))
