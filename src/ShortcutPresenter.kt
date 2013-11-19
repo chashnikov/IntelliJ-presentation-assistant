@@ -24,6 +24,8 @@ import org.nik.presentationAssistant.ShortcutPresenter.KeymapKind
 import java.awt.Font
 import java.util.ArrayList
 import com.intellij.openapi.util.SystemInfo
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.application.ApplicationManager
 
 public class ShortcutPresenter() : Disposable {
     private val movingActions = setOf(
@@ -79,16 +81,27 @@ public class ShortcutPresenter() : Disposable {
         }
 
         actionManager.addAnActionListener(object: AnActionListener {
+            var currentAction: ActionData? = null
+
             public override fun beforeActionPerformed(action: AnAction?, dataContext: DataContext?, event: AnActionEvent?) {
+                currentAction = null
                 val actionId = ActionManager.getInstance()?.getId(action!!)
                 if (actionId == null) return
 
                 if (!movingActions.contains(actionId) && !typingActions.contains(actionId)) {
-                    showActionInfo(action, actionId, event!!)
+                    val project = event!!.getProject()
+                    val text = event.getPresentation().getText()
+                    currentAction = ActionData(actionId, project, text)
                 }
             }
 
             public override fun afterActionPerformed(action: AnAction?, dataContext: DataContext?, event: AnActionEvent?) {
+                val actionData = currentAction
+                val actionId = ActionManager.getInstance()?.getId(action!!)
+                if (actionData != null && actionData.actionId == actionId) {
+                    ApplicationManager.getApplication()!!.invokeLater { showActionInfo(actionData) }
+                    showActionInfo(actionData)
+                }
             }
 
             public override fun beforeEditorTyping(c: Char, dataContext: DataContext?) { }
@@ -97,11 +110,14 @@ public class ShortcutPresenter() : Disposable {
 
     enum class KeymapKind { WIN; MAC }
 
-    public fun showActionInfo(action: AnAction, actionId: String, event: AnActionEvent) {
+    class ActionData(val actionId: String, val project: Project?, val actionText: String?)
+
+    public fun showActionInfo(actionData: ActionData) {
+        val actionId = actionData.actionId
         val winShortcut = shortcutText(winKeymap?.getShortcuts(actionId), KeymapKind.WIN)
         val macShortcut = shortcutText(macKeymap?.getShortcuts(actionId), KeymapKind.MAC)
         val parentGroupName = parentNames[actionId]
-        val actionText = (if (parentGroupName != null) "$parentGroupName ${MacKeymapUtil.RIGHT} " else "") + (event.getPresentation().getText() ?: "").trimTrailing("...")
+        val actionText = (if (parentGroupName != null) "$parentGroupName ${MacKeymapUtil.RIGHT} " else "") + (actionData.actionText ?: "").trimTrailing("...")
         val fragments = ArrayList<Pair<String, Font?>>()
         val content = StringBuilder()
         if (actionText.length > 0) {
@@ -134,9 +150,9 @@ public class ShortcutPresenter() : Disposable {
         if (infoPanel != null) {
             Disposer.dispose(infoPanel!!)
         }
-        val project = event.getProject() ?: ProjectManager.getInstance()!!.getOpenProjects().find { true }
-        if (project != null) {
-            infoPanel = ActionInfoPanel(project, fragments)
+        val realProject = actionData.project ?: ProjectManager.getInstance()!!.getOpenProjects().find { true }
+        if (realProject != null) {
+            infoPanel = ActionInfoPanel(realProject, fragments)
         }
     }
 
