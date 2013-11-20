@@ -98,7 +98,6 @@ public class ShortcutPresenter() : Disposable {
                 val actionData = currentAction
                 val actionId = ActionManager.getInstance()?.getId(action!!)
                 if (actionData != null && actionData.actionId == actionId) {
-                    ApplicationManager.getApplication()!!.invokeLater { showActionInfo(actionData) }
                     showActionInfo(actionData)
                 }
             }
@@ -172,7 +171,7 @@ public class ShortcutPresenter() : Disposable {
             infoPanel!!.close()
         }
         val realProject = actionData.project ?: ProjectManager.getInstance()!!.getOpenProjects().find { true }
-        if (realProject != null) {
+        if (realProject != null && !realProject.isDisposed() && realProject.isOpen()) {
             infoPanel = ActionInfoPanel(realProject, fragments)
         }
     }
