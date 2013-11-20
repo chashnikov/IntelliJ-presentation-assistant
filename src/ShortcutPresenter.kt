@@ -167,12 +167,14 @@ public class ShortcutPresenter() : Disposable {
         if (fragments.empty) {
             fragments.add(Pair(content.toString(), null))
         }
-        if (infoPanel != null) {
-            infoPanel!!.close()
-        }
         val realProject = actionData.project ?: ProjectManager.getInstance()!!.getOpenProjects().find { true }
         if (realProject != null && !realProject.isDisposed() && realProject.isOpen()) {
-            infoPanel = ActionInfoPanel(realProject, fragments)
+            if (infoPanel == null || infoPanel!!.isDisposed()) {
+                infoPanel = ActionInfoPanel(realProject, fragments)
+            }
+            else {
+                infoPanel!!.updateText(realProject, fragments)
+            }
         }
     }
 

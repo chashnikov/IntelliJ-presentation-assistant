@@ -20,30 +20,26 @@ import javax.swing.JLabel
 import javax.swing.SwingConstants
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.util.Pair as IdeaPair
-import java.awt.event.ActionListener
-import javax.swing.SwingUtilities
 import com.intellij.ui.popup.ComponentPopupBuilderImpl
 import java.awt.geom.RoundRectangle2D
 import javax.swing.BorderFactory
-import javax.swing.KeyStroke
-import java.awt.event.KeyEvent
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.util.Alarm
 import com.intellij.openapi.util.Disposer
+import javax.swing.JPanel
 
 val hideDelay = 4*1000
 
 class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>) : NonOpaquePanel(BorderLayout()), Disposable {
     private val hint: JBPopup
+    private val labelsPanel: JPanel
     private val hideAlarm = Alarm(this);
 
     {
         val ideFrame = WindowManager.getInstance()!!.getIdeFrame(project)!!
-        val labelsPanel = NonOpaquePanel(FlowLayout(FlowLayout.CENTER, 0, 0))
+        labelsPanel = NonOpaquePanel(FlowLayout(FlowLayout.CENTER, 0, 0))
         val background = JBColor(Color(186, 238, 186, 120), Color(73, 117, 73))
-        for (label in createLabels(textFragments, ideFrame)) {
-            labelsPanel.add(label)
-        }
+        updateLabelText(project, textFragments)
         setBackground(background)
         setOpaque(true)
         add(labelsPanel, BorderLayout.CENTER)
@@ -58,13 +54,35 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
             createPopup()
         }
 
-        val statusBarHeight = ideFrame.getStatusBar()!!.getComponent()!!.getHeight()
-        val frame = ideFrame.getComponent()!!
-        val visibleRect = frame.getVisibleRect()
-        val popupSize = getPreferredSize()!!
-        val point = Point(visibleRect.x + (visibleRect.width - popupSize.width)/2, visibleRect.y + visibleRect.height - popupSize.height - statusBarHeight - 5)
-        hint.show(RelativePoint(frame, point))
+        hint.show(computeLocation(ideFrame))
         hideAlarm.addRequest({close()}, hideDelay)
+    }
+
+    public fun updateText(project: Project, textFragments: List<Pair<String, Font?>>) {
+        labelsPanel.removeAll()
+        updateLabelText(project, textFragments)
+        hint.getContent()!!.invalidate()
+        val ideFrame = WindowManager.getInstance()!!.getIdeFrame(project)!!
+        hint.setLocation(computeLocation(ideFrame).getScreenPoint())
+        hint.setSize(getPreferredSize()!!)
+        hint.getContent()!!.repaint()
+        hideAlarm.cancelAllRequests()
+        hideAlarm.addRequest({close()}, hideDelay)
+    }
+
+    private fun computeLocation(ideFrame: IdeFrame): RelativePoint {
+        val statusBarHeight = ideFrame.getStatusBar()!!.getComponent()!!.getHeight()
+        val visibleRect = ideFrame.getComponent()!!.getVisibleRect()
+        val popupSize = getPreferredSize()!!
+        val point = Point(visibleRect.x + (visibleRect.width - popupSize.width) / 2, visibleRect.y + visibleRect.height - popupSize.height - statusBarHeight - 5)
+        return RelativePoint(ideFrame.getComponent()!!, point)
+    }
+
+    private fun updateLabelText(project: Project, textFragments: List<Pair<String, Font?>>) {
+        val ideFrame = WindowManager.getInstance()!!.getIdeFrame(project)!!
+        for (label in createLabels(textFragments, ideFrame)) {
+            labelsPanel.add(label)
+        }
     }
 
     private fun createLabels(textFragments: List<Pair<String, Font?>>, ideFrame: IdeFrame): List<JLabel> {
@@ -99,4 +117,5 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         }
     }
 
+    public fun isDisposed(): Boolean = hint.isDisposed()
 }
