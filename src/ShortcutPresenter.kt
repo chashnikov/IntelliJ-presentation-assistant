@@ -169,7 +169,7 @@ public class ShortcutPresenter() : Disposable {
             fragments.add(Pair(content.toString(), null))
         }
         if (infoPanel != null) {
-            Disposer.dispose(infoPanel!!)
+            infoPanel!!.close()
         }
         val realProject = actionData.project ?: ProjectManager.getInstance()!!.getOpenProjects().find { true }
         if (realProject != null) {
@@ -205,7 +205,7 @@ public class ShortcutPresenter() : Disposable {
 
     public fun disable() {
         if (infoPanel != null) {
-            Disposer.dispose(infoPanel!!)
+            infoPanel!!.close()
             infoPanel = null
         }
         Disposer.dispose(this)

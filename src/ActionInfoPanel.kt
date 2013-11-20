@@ -28,9 +28,14 @@ import javax.swing.BorderFactory
 import javax.swing.KeyStroke
 import java.awt.event.KeyEvent
 import com.intellij.ui.IdeBorderFactory
+import com.intellij.util.Alarm
+import com.intellij.openapi.util.Disposer
+
+val hideDelay = 4*1000
 
 class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>) : NonOpaquePanel(BorderLayout()), Disposable {
     private val hint: JBPopup
+    private val hideAlarm = Alarm(this);
 
     {
         val ideFrame = WindowManager.getInstance()!!.getIdeFrame(project)!!
@@ -64,6 +69,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         val popupSize = getPreferredSize()!!
         val point = Point(visibleRect.x + (visibleRect.width - popupSize.width)/2, visibleRect.y + visibleRect.height - popupSize.height - statusBarHeight - 5)
         hint.show(RelativePoint(frame, point))
+        hideAlarm.addRequest({close()}, hideDelay)
     }
 
     private fun createLabels(textFragments: List<Pair<String, Font?>>, ideFrame: IdeFrame): List<JLabel> {
@@ -86,6 +92,10 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
             }
         }
         return labels
+    }
+
+    public fun close() {
+        Disposer.dispose(this)
     }
 
     public override fun dispose() {
