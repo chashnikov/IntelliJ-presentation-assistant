@@ -42,15 +42,16 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         setBackground(background)
         setOpaque(true)
         add(labelsPanel, BorderLayout.CENTER)
-        setBorder(BorderFactory.createCompoundBorder(IdeBorderFactory.createRoundedBorder(20), BorderFactory.createEmptyBorder(5,5,5,5)))
+        val arcSize = 15
+        setBorder(BorderFactory.createCompoundBorder(IdeBorderFactory.createRoundedBorder(arcSize), BorderFactory.createEmptyBorder(5,10,5,10)))
 
         val cancelListener = IdeaPair(ActionListener {
             //this seems to be the simplest way to cancel the hint on Esc and don't consume the Esc event
             SwingUtilities.invokeLater { hint.cancel() }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0))
         hint = with (JBPopupFactory.getInstance()!!.createComponentPopupBuilder(this, this) as ComponentPopupBuilderImpl) {
-            setAlpha(0.2)
-            setMaskProvider { RoundRectangle2D.Double(1.0, 1.0, it!!.getWidth()-2, it.getHeight()-2, 20.0, 20.0) }
+            setAlpha(0.1)
+            setMaskProvider { RoundRectangle2D.Double(1.0, 1.0, it!!.getWidth()-2, it.getHeight()-2, arcSize.toDouble(), arcSize.toDouble()) }
             setFocusable(false)
             setCancelKeyEnabled(false)
             setKeyboardActions(arrayListOf(cancelListener))
