@@ -24,7 +24,6 @@ import java.awt.Font
 import java.util.ArrayList
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.application.ApplicationManager
 
 public class ShortcutPresenter() : Disposable {
     private val movingActions = setOf(
@@ -106,26 +105,25 @@ public class ShortcutPresenter() : Disposable {
         }, this)
     }
 
-    enum class KeymapKind { WIN; MAC }
+    enum class KeymapKind(val displayName: String) {
+        WIN: KeymapKind("Win/Linux")
+        MAC: KeymapKind("Mac")
+
+        fun getAlternativeKind() = when (this) {
+            WIN -> MAC
+            MAC -> WIN
+        }
+    }
 
     fun getCurrentOSKind() = when {
         SystemInfo.isMac -> KeymapKind.MAC
         else -> KeymapKind.WIN
     }
 
-    fun KeymapKind.getAlternativeKind() = when (this) {
-        KeymapKind.WIN -> KeymapKind.MAC
-        KeymapKind.MAC -> KeymapKind.WIN
-    }
 
     fun KeymapKind.getKeymap() = when (this) {
         KeymapKind.WIN -> winKeymap
         KeymapKind.MAC -> macKeymap
-    }
-
-    fun KeymapKind.getDisplayName() = when (this) {
-        KeymapKind.WIN -> "Win/Linux"
-        KeymapKind.MAC -> "Mac"
     }
 
     class ActionData(val actionId: String, val project: Project?, val actionText: String?)
@@ -147,7 +145,7 @@ public class ShortcutPresenter() : Disposable {
             content.append(currentShortcut)
         }
         if (alternativeShortcut.length > 0 && alternativeShortcut != currentShortcut) {
-            val altText = "for ${alternativeKind.getDisplayName()}"
+            val altText = "for ${alternativeKind.displayName}"
             when {
                 alternativeKind == KeymapKind.WIN -> content.append(" ($alternativeShortcut $altText)")
                 macKeyStokesFont != null && macKeyStokesFont!!.canDisplayUpTo(alternativeShortcut) == -1 -> {
