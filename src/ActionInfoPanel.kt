@@ -27,13 +27,19 @@ import com.intellij.ui.IdeBorderFactory
 import com.intellij.util.Alarm
 import com.intellij.openapi.util.Disposer
 import javax.swing.JPanel
+import com.intellij.util.ui.Animator
+import javax.swing.SwingUtilities
 
 val hideDelay = 4*1000
+val hintAlpha = 0.1.toFloat()
 
 class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>) : NonOpaquePanel(BorderLayout()), Disposable {
     private val hint: JBPopup
     private val labelsPanel: JPanel
     private val hideAlarm = Alarm(this);
+    private var animator: Animator
+    private var phase = Phase.FADING_IN
+    enum class Phase { FADING_IN; SHOWN; FADING_OUT; HIDDEN}
 
     {
         val ideFrame = WindowManager.getInstance()!!.getIdeFrame(project)!!
@@ -47,15 +53,45 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         setBorder(BorderFactory.createCompoundBorder(IdeBorderFactory.createRoundedBorder(arcSize), BorderFactory.createEmptyBorder(5,10,5,10)))
 
         hint = with (JBPopupFactory.getInstance()!!.createComponentPopupBuilder(this, this) as ComponentPopupBuilderImpl) {
-            setAlpha(0.1)
+            setAlpha(1.0.toFloat())
             setMaskProvider { RoundRectangle2D.Double(1.0, 1.0, it!!.getWidth()-2, it.getHeight()-2, arcSize.toDouble(), arcSize.toDouble()) }
             setFocusable(false)
             setCancelKeyEnabled(false)
+            setCancelCallback { phase = Phase.HIDDEN; true }
             createPopup()
         }
 
+        animator = FadeInOutAnimator(true)
         hint.show(computeLocation(ideFrame))
-        hideAlarm.addRequest({close()}, hideDelay)
+        animator.resume()
+    }
+
+    private fun fadeOut() {
+        if (phase != Phase.SHOWN) return
+        phase = Phase.FADING_OUT
+        Disposer.dispose(animator)
+        animator = FadeInOutAnimator(false)
+        animator.resume()
+    }
+
+    inner class FadeInOutAnimator(val forward: Boolean): Animator("Action Hint Fade In/Out", 5, 100, false, forward) {
+        override fun paintNow(frame: Int, totalFrames: Int, cycle: Int) {
+            if (forward && phase != Phase.FADING_IN
+                || !forward && phase != Phase.FADING_OUT) return
+            val window = SwingUtilities.windowForComponent(hint.getContent()!!)
+            WindowManager.getInstance()!!.setAlphaModeRatio(window, hintAlpha +(1- hintAlpha)*(totalFrames-frame)/totalFrames)
+        }
+
+        override fun paintCycleEnd() {
+            if (forward) {
+                phase = Phase.SHOWN
+                hideAlarm.cancelAllRequests()
+                hideAlarm.addRequest({fadeOut()}, hideDelay)
+            }
+            else {
+                close()
+            }
+        }
     }
 
     public fun updateText(project: Project, textFragments: List<Pair<String, Font?>>) {
@@ -67,7 +103,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         hint.setSize(getPreferredSize()!!)
         hint.getContent()!!.repaint()
         hideAlarm.cancelAllRequests()
-        hideAlarm.addRequest({close()}, hideDelay)
+        hideAlarm.addRequest({fadeOut()}, hideDelay)
     }
 
     private fun computeLocation(ideFrame: IdeFrame): RelativePoint {
@@ -112,10 +148,12 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
     }
 
     public override fun dispose() {
+        phase = Phase.HIDDEN
         if (!hint.isDisposed()) {
             hint.cancel()
         }
+        Disposer.dispose(animator)
     }
 
-    public fun isDisposed(): Boolean = hint.isDisposed()
+    public fun canBeReused(): Boolean = phase == Phase.FADING_IN || phase == Phase.SHOWN
 }

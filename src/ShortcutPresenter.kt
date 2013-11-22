@@ -167,7 +167,7 @@ public class ShortcutPresenter() : Disposable {
         }
         val realProject = actionData.project ?: ProjectManager.getInstance()!!.getOpenProjects().find { true }
         if (realProject != null && !realProject.isDisposed() && realProject.isOpen()) {
-            if (infoPanel == null || infoPanel!!.isDisposed()) {
+            if (infoPanel == null || !infoPanel!!.canBeReused()) {
                 infoPanel = ActionInfoPanel(realProject, fragments)
             }
             else {
