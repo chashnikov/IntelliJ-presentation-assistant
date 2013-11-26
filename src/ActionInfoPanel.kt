@@ -56,6 +56,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
             setAlpha(1.0.toFloat())
             setMaskProvider { RoundRectangle2D.Double(1.0, 1.0, it!!.getWidth()-2, it.getHeight()-2, arcSize.toDouble(), arcSize.toDouble()) }
             setFocusable(false)
+            setBelongsToGlobalPopupStack(false)
             setCancelKeyEnabled(false)
             setCancelCallback { phase = Phase.HIDDEN; true }
             createPopup()
