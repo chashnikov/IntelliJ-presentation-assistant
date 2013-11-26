@@ -29,9 +29,9 @@ import com.intellij.openapi.util.Disposer
 import javax.swing.JPanel
 import com.intellij.util.ui.Animator
 import javax.swing.SwingUtilities
+import com.intellij.util.ui.UIUtil
 
 val hideDelay = 4*1000
-val hintAlpha = 0.1.toFloat()
 
 class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>) : NonOpaquePanel(BorderLayout()), Disposable {
     private val hint: JBPopup
@@ -39,6 +39,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
     private val hideAlarm = Alarm(this);
     private var animator: Animator
     private var phase = Phase.FADING_IN
+    private val hintAlpha = if (UIUtil.isUnderDarcula()) 0.05.toFloat() else 0.1.toFloat()
     enum class Phase { FADING_IN; SHOWN; FADING_OUT; HIDDEN}
 
     {
