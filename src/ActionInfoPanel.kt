@@ -80,20 +80,29 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         override fun paintNow(frame: Int, totalFrames: Int, cycle: Int) {
             if (forward && phase != Phase.FADING_IN
                 || !forward && phase != Phase.FADING_OUT) return
-            val window = SwingUtilities.windowForComponent(hint.getContent()!!)
-            WindowManager.getInstance()!!.setAlphaModeRatio(window, hintAlpha +(1- hintAlpha)*(totalFrames-frame)/totalFrames)
+            setAlpha(hintAlpha +(1- hintAlpha)*(totalFrames-frame)/totalFrames)
         }
 
         override fun paintCycleEnd() {
             if (forward) {
-                phase = Phase.SHOWN
-                hideAlarm.cancelAllRequests()
-                hideAlarm.addRequest({fadeOut()}, hideDelay)
+                showFinal()
             }
             else {
                 close()
             }
         }
+    }
+
+    private fun setAlpha(alpha: Float) {
+        val window = SwingUtilities.windowForComponent(hint.getContent()!!)
+        WindowManager.getInstance()!!.setAlphaModeRatio(window, alpha)
+    }
+
+    private fun showFinal() {
+        phase = Phase.SHOWN
+        setAlpha(hintAlpha)
+        hideAlarm.cancelAllRequests()
+        hideAlarm.addRequest({fadeOut()}, hideDelay)
     }
 
     public fun updateText(project: Project, textFragments: List<Pair<String, Font?>>) {
@@ -104,8 +113,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         hint.setLocation(computeLocation(ideFrame).getScreenPoint())
         hint.setSize(getPreferredSize()!!)
         hint.getContent()!!.repaint()
-        hideAlarm.cancelAllRequests()
-        hideAlarm.addRequest({fadeOut()}, hideDelay)
+        showFinal()
     }
 
     private fun computeLocation(ideFrame: IdeFrame): RelativePoint {
