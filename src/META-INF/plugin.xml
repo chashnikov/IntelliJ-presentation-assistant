@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.nik.presentation-assistant</id>
   <name>Presentation Assistant</name>
-  <version>0.9</version>
+  <version>0.9.1</version>
   <vendor>Nikolay Chashnikov</vendor>
 
   <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (Settings | Presentation Assistant) ]]></description>
