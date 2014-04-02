@@ -1,3 +1,5 @@
+package org.nik.presentationAssistant;
+
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.PersistentStateComponent;
 import org.nik.presentationAssistant.PresentationAssistantState;

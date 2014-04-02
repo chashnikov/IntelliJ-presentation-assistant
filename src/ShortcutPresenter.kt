@@ -24,6 +24,7 @@ import java.awt.Font
 import java.util.ArrayList
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.project.Project
+import com.intellij.util.PlatformUtils
 
 public class ShortcutPresenter() : Disposable {
     private val movingActions = setOf(
@@ -111,7 +112,7 @@ public class ShortcutPresenter() : Disposable {
 
         fun getAlternativeKind() = when (this) {
             WIN -> MAC
-            MAC -> WIN
+            MAC -> if (PlatformUtils.isAppCode()) null else WIN
         }
     }
 
@@ -132,7 +133,6 @@ public class ShortcutPresenter() : Disposable {
         val actionId = actionData.actionId
         val currentShortcut = shortcutText(getCurrentOSKind().getKeymap()?.getShortcuts(actionId), getCurrentOSKind())
         val alternativeKind = getCurrentOSKind().getAlternativeKind()
-        val alternativeShortcut = shortcutText(alternativeKind.getKeymap()?.getShortcuts(actionId), alternativeKind)
         val parentGroupName = parentNames[actionId]
         val actionText = (if (parentGroupName != null) "$parentGroupName ${MacKeymapUtil.RIGHT} " else "") + (actionData.actionText ?: "").trimTrailing("...")
         val fragments = ArrayList<Pair<String, Font?>>()
@@ -144,20 +144,24 @@ public class ShortcutPresenter() : Disposable {
             if (content.length > 0) content.append(" via ")
             content.append(currentShortcut)
         }
-        if (alternativeShortcut.length > 0 && alternativeShortcut != currentShortcut) {
-            val altText = "for ${alternativeKind.displayName}"
-            when {
-                alternativeKind == KeymapKind.WIN -> content.append(" ($alternativeShortcut $altText)")
-                macKeyStokesFont != null && macKeyStokesFont!!.canDisplayUpTo(alternativeShortcut) == -1 -> {
-                    content.append(" (")
-                    fragments.add(Pair(content.toString(), null))
-                    fragments.add(Pair(alternativeShortcut, macKeyStokesFont))
-                    fragments.add(Pair("&nbsp;$altText)", null))
-                }
-                else -> {
-                    val macShortcutAsWin = shortcutText(macKeymap?.getShortcuts(actionId), KeymapKind.WIN)
-                    if (macShortcutAsWin.length > 0 && macShortcutAsWin != currentShortcut) {
-                        content.append(" ($macShortcutAsWin $altText)")
+
+        if (alternativeKind != null) {
+            val alternativeShortcut = shortcutText(alternativeKind.getKeymap()?.getShortcuts(actionId), alternativeKind)
+            if (alternativeShortcut.length > 0 && alternativeShortcut != currentShortcut) {
+                val altText = "for ${alternativeKind.displayName}"
+                when {
+                    alternativeKind == KeymapKind.WIN -> content.append(" ($alternativeShortcut $altText)")
+                    macKeyStokesFont != null && macKeyStokesFont!!.canDisplayUpTo(alternativeShortcut) == -1 -> {
+                        content.append(" (")
+                        fragments.add(Pair(content.toString(), null))
+                        fragments.add(Pair(alternativeShortcut, macKeyStokesFont))
+                        fragments.add(Pair("&nbsp;$altText)", null))
+                    }
+                    else -> {
+                        val macShortcutAsWin = shortcutText(macKeymap?.getShortcuts(actionId), KeymapKind.WIN)
+                        if (macShortcutAsWin.length > 0 && macShortcutAsWin != currentShortcut) {
+                            content.append(" ($macShortcutAsWin $altText)")
+                        }
                     }
                 }
             }

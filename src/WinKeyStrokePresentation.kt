@@ -1,6 +1,7 @@
 /**
  * @author nik
  */
+package org.nik.presentationAssistant
 
 import java.awt.event.InputEvent
 import com.intellij.openapi.util.text.StringUtil
