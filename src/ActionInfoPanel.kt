@@ -31,6 +31,9 @@ import com.intellij.util.ui.Animator
 import javax.swing.SwingUtilities
 import com.intellij.util.ui.UIUtil
 import com.intellij.openapi.ui.popup.MaskProvider
+import com.intellij.openapi.ui.popup.JBPopupListener
+import com.intellij.openapi.ui.popup.LightweightWindowEvent
+import javax.swing.SwingUtilities
 
 val hideDelay = 4*1000
 
@@ -79,6 +82,12 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
             setCancelCallback { phase = Phase.HIDDEN; true }
             createPopup()
         }
+        hint.addListener(object : JBPopupListener {
+            override fun beforeShown(lightweightWindowEvent: LightweightWindowEvent?) {}
+            override fun onClosed(lightweightWindowEvent: LightweightWindowEvent?) {
+                phase = Phase.HIDDEN
+            }
+        })
 
         animator = FadeInOutAnimator(true)
         hint.show(computeLocation(ideFrame))
