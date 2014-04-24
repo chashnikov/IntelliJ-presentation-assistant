@@ -89,7 +89,8 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         try {
             javaClass<ComponentPopupBuilderImpl>().getMethod("setMaskProvider", javaClass<MaskProvider>())
             return true
-        } catch(ignored: NoSuchMethodError) {
+        }
+        catch(ignored: NoSuchMethodException) {
             return false
         }
     }
