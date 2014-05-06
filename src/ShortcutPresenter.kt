@@ -10,7 +10,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.util.Disposer
-import com.intellij.openapi.keymap.KeymapManager
 import com.intellij.openapi.actionSystem.Shortcut
 import com.intellij.openapi.actionSystem.ActionGroup
 import java.util.HashMap
@@ -19,12 +18,9 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import javax.swing.KeyStroke
 import com.intellij.openapi.keymap.MacKeymapUtil
-import org.nik.presentationAssistant.ShortcutPresenter.KeymapKind
 import java.awt.Font
 import java.util.ArrayList
-import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.project.Project
-import com.intellij.util.PlatformUtils
 
 public class ShortcutPresenter() : Disposable {
     private val movingActions = setOf(
@@ -41,8 +37,6 @@ public class ShortcutPresenter() : Disposable {
     private val typingActions = setOf(IdeActions.ACTION_EDITOR_BACKSPACE, IdeActions.ACTION_EDITOR_ENTER,
             IdeActions.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE)
     private val parentGroupIds = setOf("CodeCompletionGroup", "FoldingGroup", "GoToMenu", "IntroduceActionsGroup")
-    private val winKeymap = KeymapManager.getInstance()!!.getKeymap("\$default")
-    private val macKeymap = KeymapManager.getInstance()!!.getKeymap("Mac OS X");
     private var infoPanel: ActionInfoPanel? = null
     private val parentNames = HashMap<String, String>();
 
@@ -106,70 +100,41 @@ public class ShortcutPresenter() : Disposable {
         }, this)
     }
 
-    enum class KeymapKind(val displayName: String) {
-        WIN: KeymapKind("Win/Linux")
-        MAC: KeymapKind("Mac")
-
-        fun getAlternativeKind() = when (this) {
-            WIN -> MAC
-            MAC -> if (PlatformUtils.isAppCode()) null else WIN
-        }
-    }
-
-    fun getCurrentOSKind() = when {
-        SystemInfo.isMac -> KeymapKind.MAC
-        else -> KeymapKind.WIN
-    }
-
-
-    fun KeymapKind.getKeymap() = when (this) {
-        KeymapKind.WIN -> winKeymap
-        KeymapKind.MAC -> macKeymap
-    }
-
     class ActionData(val actionId: String, val project: Project?, val actionText: String?)
+
+    private fun MutableList<Pair<String, Font?>>.addText(text: String) {
+        this.add(Pair(text, null))
+    }
 
     public fun showActionInfo(actionData: ActionData) {
         val actionId = actionData.actionId
-        val currentShortcut = shortcutText(getCurrentOSKind().getKeymap()?.getShortcuts(actionId), getCurrentOSKind())
-        val alternativeKind = getCurrentOSKind().getAlternativeKind()
         val parentGroupName = parentNames[actionId]
         val actionText = (if (parentGroupName != null) "$parentGroupName ${MacKeymapUtil.RIGHT} " else "") + (actionData.actionText ?: "").trimTrailing("...")
+
         val fragments = ArrayList<Pair<String, Font?>>()
-        val content = StringBuilder()
         if (actionText.length > 0) {
-            content.append("<b>${actionText}</b>")
-        }
-        if (currentShortcut.length > 0 && currentShortcut != actionText) {
-            if (content.length > 0) content.append(" via ")
-            content.append(currentShortcut)
+            fragments.addText("<b>${actionText}</b>")
         }
 
-        if (alternativeKind != null) {
-            val alternativeShortcut = shortcutText(alternativeKind.getKeymap()?.getShortcuts(actionId), alternativeKind)
-            if (alternativeShortcut.length > 0 && alternativeShortcut != currentShortcut) {
-                val altText = "for ${alternativeKind.displayName}"
-                when {
-                    alternativeKind == KeymapKind.WIN -> content.append(" ($alternativeShortcut $altText)")
-                    macKeyStokesFont != null && macKeyStokesFont!!.canDisplayUpTo(alternativeShortcut) == -1 -> {
-                        content.append(" (")
-                        fragments.add(Pair(content.toString(), null))
-                        fragments.add(Pair(alternativeShortcut, macKeyStokesFont))
-                        fragments.add(Pair("&nbsp;$altText)", null))
-                    }
-                    else -> {
-                        val macShortcutAsWin = shortcutText(macKeymap?.getShortcuts(actionId), KeymapKind.WIN)
-                        if (macShortcutAsWin.length > 0 && macShortcutAsWin != currentShortcut) {
-                            content.append(" ($macShortcutAsWin $altText)")
-                        }
-                    }
-                }
+        val mainKeymap = getPresentationAssistant().configuration.mainKeymap
+        val shortcutTextFragments = shortcutTextFragments(mainKeymap, actionId, actionText)
+        if (shortcutTextFragments.notEmpty) {
+            if (fragments.notEmpty) fragments.addText(" via&nbsp;")
+            fragments.addAll(shortcutTextFragments)
+        }
+
+        val alternativeKeymap = getPresentationAssistant().configuration.alternativeKeymap
+        if (alternativeKeymap != null) {
+            val mainShortcut = shortcutText(mainKeymap.getKeymap()?.getShortcuts(actionId), mainKeymap.getKind())
+            val altShortcutTextFragments = shortcutTextFragments(alternativeKeymap, actionId, mainShortcut)
+            if (altShortcutTextFragments.notEmpty) {
+                fragments.addText("&nbsp;(");
+                fragments.addAll(altShortcutTextFragments)
+                fragments.addText(")");
             }
         }
-        if (fragments.empty) {
-            fragments.add(Pair(content.toString(), null))
-        }
-        val realProject = actionData.project ?: ProjectManager.getInstance()!!.getOpenProjects().find { true }
+
+        val realProject = actionData.project ?: ProjectManager.getInstance()!!.getOpenProjects().firstOrNull()
         if (realProject != null && !realProject.isDisposed() && realProject.isOpen()) {
             if (infoPanel == null || !infoPanel!!.canBeReused()) {
                 infoPanel = ActionInfoPanel(realProject, fragments)
@@ -180,10 +145,33 @@ public class ShortcutPresenter() : Disposable {
         }
     }
 
+    private fun shortcutTextFragments(keymap: KeymapDescription, actionId: String, shownShortcut: String) : List<Pair<String, Font?>> {
+        val fragments = ArrayList<Pair<String, Font?>>()
+        val shortcutText = shortcutText(keymap.getKeymap()?.getShortcuts(actionId), keymap.getKind())
+        if (shortcutText.isEmpty() || shortcutText == shownShortcut) return fragments
+
+        when {
+            keymap.getKind() == KeymapKind.WIN -> fragments.addText(shortcutText)
+            macKeyStokesFont != null && macKeyStokesFont!!.canDisplayUpTo(shortcutText) == -1 -> {
+                fragments.add(Pair(shortcutText, macKeyStokesFont))
+            }
+            else -> {
+                val altShortcutAsWin = shortcutText(keymap.getKeymap()?.getShortcuts(actionId), KeymapKind.WIN)
+                if (altShortcutAsWin.length > 0 && shownShortcut != altShortcutAsWin) {
+                    fragments.addText(altShortcutAsWin)
+                }
+            }
+        }
+        val keymapText = keymap.displayText
+        if (keymapText.isNotEmpty()) {
+            fragments.addText("&nbsp;$keymapText")
+        }
+        return fragments
+    }
+
     private fun shortcutText(shortcuts: Array<Shortcut>?, keymapKind: KeymapKind) =
         when {
             shortcuts == null || shortcuts.size == 0 -> ""
-//            win -> shortcutText(shortcuts!![0], win)//todo[nik] why do I need '!!' here
             else -> shortcutText(shortcuts[0], keymapKind)
         }
 

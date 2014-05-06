@@ -12,8 +12,6 @@ import java.awt.GraphicsEnvironment
 
 val LOG = Logger.getInstance("#org.nik.presentationAssistant.MacKeyStrokePresentation")
 
-//todo[nik] move to Kotlin std lib?
-
 val macKeyStokesFont by Delegates.lazy {
     GraphicsEnvironment.getLocalGraphicsEnvironment()!!.getAllFonts()!!
             .minBy { getNonDisplayableMacSymbols(it).size }

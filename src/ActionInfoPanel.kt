@@ -28,12 +28,12 @@ import com.intellij.util.Alarm
 import com.intellij.openapi.util.Disposer
 import javax.swing.JPanel
 import com.intellij.util.ui.Animator
-import javax.swing.SwingUtilities
 import com.intellij.util.ui.UIUtil
 import com.intellij.openapi.ui.popup.MaskProvider
 import com.intellij.openapi.ui.popup.JBPopupListener
 import com.intellij.openapi.ui.popup.LightweightWindowEvent
 import javax.swing.SwingUtilities
+import java.util.ArrayList
 
 val hideDelay = 4*1000
 
@@ -167,9 +167,24 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         }
     }
 
+    private fun List<Pair<String, Font?>>.mergeFragments() : List<Pair<String, Font?>> {
+        var result = ArrayList<Pair<String, Font?>>()
+        for (item in this) {
+            val last = result.last
+            if (last != null && last.second == item.second) {
+                result.remove(result.lastIndex)
+                result.add(Pair(last.first + item.first, last.second))
+            }
+            else {
+                result.add(item)
+            }
+        }
+        return result
+    }
+
     private fun createLabels(textFragments: List<Pair<String, Font?>>, ideFrame: IdeFrame): List<JLabel> {
         var fontSize = getPresentationAssistant().configuration.fontSize.toFloat()
-        val labels = textFragments.map {
+        val labels = textFragments.mergeFragments().map {
             val label = JLabel("<html>${it.first}</html>", SwingConstants.CENTER)
             if (it.second != null) label.setFont(it.second)
             label
@@ -177,6 +192,16 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         fun setFontSize(size: Float) {
             for (label in labels) {
                 label.setFont(label.getFont()!!.deriveFont(size))
+            }
+            val maxAscent = labels.map { it.getFontMetrics(it.getFont()!!).getMaxAscent() }.max() ?: 0
+            for (label in labels) {
+                val ascent = label.getFontMetrics(label.getFont()!!).getMaxAscent()
+                if (ascent < maxAscent) {
+                    label.setBorder(BorderFactory.createEmptyBorder(maxAscent - ascent, 0, 0, 0))
+                }
+                else {
+                    label.setBorder(null)
+                }
             }
         }
         setFontSize(fontSize)
