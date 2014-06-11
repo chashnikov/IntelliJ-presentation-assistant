@@ -29,11 +29,8 @@ public class PresentationAssistantState {
 }
 
 //todo[nik] report kotlin bug: if PersistentStateComponent is implemented directly IDEA is unable to obtain state class
-//todo[nik] report kotlin bug: it seems that expressions aren't evaluated in annotations
-//State(name = "PresentationAssistant", storages = array(Storage(file = "${StoragePathMacros.APP_CONFIG}/presentation-assistant.xml")))
-State(name = "PresentationAssistant", storages = array(Storage(file = "\$APP_CONFIG\$/presentation-assistant.xml")))
+State(name = "PresentationAssistant", storages = array(Storage(file = "${StoragePathMacros.APP_CONFIG}/presentation-assistant.xml")))
 public class PresentationAssistant : PresentationAssistantBase() {
-    //todo[nik] report kotlin bug: val state and getState() results in duplicated method exception
     val configuration = PresentationAssistantState()
     var presenter: ShortcutPresenter? = null
 
