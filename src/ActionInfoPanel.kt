@@ -34,6 +34,7 @@ import com.intellij.openapi.ui.popup.JBPopupListener
 import com.intellij.openapi.ui.popup.LightweightWindowEvent
 import javax.swing.SwingUtilities
 import java.util.ArrayList
+import java.awt.Window
 
 val hideDelay = 4*1000
 
@@ -129,9 +130,17 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         }
     }
 
-    private fun setAlpha(alpha: Float) {
+    private fun getHintWindow(): Window? {
         val window = SwingUtilities.windowForComponent(hint.getContent()!!)
-        WindowManager.getInstance()!!.setAlphaModeRatio(window, alpha)
+        if (window != null && window.isShowing()) return window
+        return null;
+    }
+
+    private fun setAlpha(alpha: Float) {
+        val window = getHintWindow()
+        if (window != null) {
+            WindowManager.getInstance()!!.setAlphaModeRatio(window, alpha)
+        }
     }
 
     private fun showFinal() {
@@ -142,6 +151,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
     }
 
     public fun updateText(project: Project, textFragments: List<Pair<String, Font?>>) {
+        if (getHintWindow() == null) return
         labelsPanel.removeAll()
         updateLabelText(project, textFragments)
         hint.getContent()!!.invalidate()
