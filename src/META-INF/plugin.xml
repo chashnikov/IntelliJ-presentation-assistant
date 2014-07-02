@@ -1,26 +1,35 @@
 <idea-plugin version="2">
-  <id>org.nik.presentation-assistant</id>
-  <name>Presentation Assistant</name>
-  <version>0.9.5</version>
-  <vendor>Nikolay Chashnikov</vendor>
+    <id>org.nik.presentation-assistant</id>
+    <name>Presentation Assistant</name>
+    <version>0.9.6</version>
+    <vendor>Nikolay Chashnikov</vendor>
 
-  <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (Settings | Presentation Assistant) ]]></description>
-  <change-notes><![CDATA[
+    <description>
+        <![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (Settings | Presentation Assistant) ]]></description>
+    <change-notes><![CDATA[
     <ul>
     <li>Keymaps used in notifications can be configured in Settings</li>
+    <li>Functionality of plugin can be toggle via keyboard shortcut. (Default Ctrl+Shift+P)</li>
     </ul>
 ]]></change-notes>
 
-  <idea-version since-build="107.105"/>
+    <idea-version since-build="107.105"/>
 
-  <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.lang</depends>
 
-  <application-components>
-      <component>
-          <implementation-class>org.nik.presentationAssistant.PresentationAssistant</implementation-class>
-      </component>
-  </application-components>
-  <extensions defaultExtensionNs="com.intellij">
-      <applicationConfigurable instance="org.nik.presentationAssistant.PresentationAssistantConfigurable"/>
-  </extensions>
+    <actions>
+        <action id="org.nik.presentationAssistant.PresentationAssistantToggle" text="Toggle PresentationAssistant" class="org.nik.presentationAssistant.actions.ShowHideAction"
+                description="Toggles PresentationAssistant on and off">
+            <keyboard-shortcut first-keystroke="control shift P" keymap="$default"/>
+        </action>
+    </actions>
+
+    <application-components>
+        <component>
+            <implementation-class>org.nik.presentationAssistant.PresentationAssistant</implementation-class>
+        </component>
+    </application-components>
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable instance="org.nik.presentationAssistant.PresentationAssistantConfigurable"/>
+    </extensions>
 </idea-plugin>
