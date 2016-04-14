@@ -9,26 +9,26 @@ import kotlin.properties.Delegates
 import java.awt.event.KeyEvent
 import java.lang.reflect.Modifier
 
-val inputEventMaskFieldNames by Delegates.lazy {
-    javaClass<InputEvent>().getFields()
+val inputEventMaskFieldNames by lazy {
+    InputEvent::class.java.getFields()
             .filter { it.getName()!!.endsWith("_MASK") && !it.getName()!!.endsWith("_DOWN_MASK")
                       && !it.getName()!!.startsWith("BUTTON")
                       && Modifier.isStatic(it.getModifiers()) && it.get(null) is Int}
-            .map { Pair(fieldNameToPresentableName(it.getName()!!.trimTrailing("_MASK")), it.get(null) as Int)}
+            .map { Pair(fieldNameToPresentableName(it.getName()!!.removeSuffix("_MASK")), it.get(null) as Int)}
 }
 
 fun getWinModifiersText(modifiers: Int) =
         inputEventMaskFieldNames
                 .filter { modifiers and (it.second) != 0}
                 .map { it.first }
-                .makeString("+")
+                .joinToString("+")
 
-val keyEventFieldNames by Delegates.lazy {
-    javaClass<KeyEvent>().getFields()
+val keyEventFieldNames by lazy {
+    KeyEvent::class.java.getFields()
             .filter { it.getName()!!.startsWith("VK_") && Modifier.isStatic(it.getModifiers()) && it.get(null) is Int}
-            .map { Pair(fieldNameToPresentableName(it.getName()!!.trimLeading("VK_")), it.get(null) as Int)}
+            .map { Pair(fieldNameToPresentableName(it.getName()!!.removePrefix("VK_")), it.get(null) as Int)}
             .groupBy { it.second }
-            .mapValues { it.value.first!!.first }
+            .mapValues { it.value.first()!!.first }
 }
 
 fun getWinKeyText(key: Int) =
@@ -40,9 +40,9 @@ fun getWinKeyText(key: Int) =
         KeyEvent.VK_SUBTRACT -> "NumPad -"
         KeyEvent.VK_DECIMAL -> "NumPad ."
         KeyEvent.VK_DIVIDE -> "NumPad /"
-        in keyEventFieldNames.keySet() -> keyEventFieldNames[key]
+        in keyEventFieldNames.keys -> keyEventFieldNames[key]
         else -> "Unknown key 0x${Integer.toHexString(key)}"
     }
         
 
-fun fieldNameToPresentableName(name: String) = name.split('_').map { StringUtil.capitalize(it.toLowerCase()) }.makeString(" ")
+fun fieldNameToPresentableName(name: String) = name.split('_').map { StringUtil.capitalize(it.toLowerCase()) }.joinToString(" ")

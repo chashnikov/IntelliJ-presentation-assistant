@@ -11,8 +11,8 @@ private val winKeymap = KeymapManager.getInstance()!!.getKeymap(KeymapKind.WIN.d
 private val macKeymap = KeymapManager.getInstance()!!.getKeymap(KeymapKind.MAC.defaultKeymapName);
 
 enum class KeymapKind(val displayName: String, val defaultKeymapName: String) {
-    WIN: KeymapKind("Win/Linux", "\$default")
-    MAC: KeymapKind("Mac", "Mac OS X 10.5+")
+    WIN("Win/Linux", "\$default"),
+    MAC("Mac", "Mac OS X 10.5+");
 
     fun getAlternativeKind() = when (this) {
         WIN -> MAC

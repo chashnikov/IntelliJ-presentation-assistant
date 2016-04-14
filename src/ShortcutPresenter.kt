@@ -39,7 +39,7 @@ public class ShortcutPresenter() : Disposable {
     private val parentGroupIds = setOf("CodeCompletionGroup", "FoldingGroup", "GoToMenu", "IntroduceActionsGroup")
     private var infoPanel: ActionInfoPanel? = null
     private val parentNames = HashMap<String, String>();
-
+    init
     {
         enable()
     }
@@ -109,7 +109,7 @@ public class ShortcutPresenter() : Disposable {
     public fun showActionInfo(actionData: ActionData) {
         val actionId = actionData.actionId
         val parentGroupName = parentNames[actionId]
-        val actionText = (if (parentGroupName != null) "$parentGroupName ${MacKeymapUtil.RIGHT} " else "") + (actionData.actionText ?: "").trimTrailing("...")
+        val actionText = (if (parentGroupName != null) "$parentGroupName ${MacKeymapUtil.RIGHT} " else "") + (actionData.actionText ?: "").removeSuffix("...")
 
         val fragments = ArrayList<Pair<String, Font?>>()
         if (actionText.length > 0) {
@@ -118,8 +118,8 @@ public class ShortcutPresenter() : Disposable {
 
         val mainKeymap = getPresentationAssistant().configuration.mainKeymap
         val shortcutTextFragments = shortcutTextFragments(mainKeymap, actionId, actionText)
-        if (shortcutTextFragments.notEmpty) {
-            if (fragments.notEmpty) fragments.addText(" via&nbsp;")
+        if (shortcutTextFragments.isNotEmpty()) {
+            if (fragments.isNotEmpty()) fragments.addText(" via&nbsp;")
             fragments.addAll(shortcutTextFragments)
         }
 
@@ -127,7 +127,7 @@ public class ShortcutPresenter() : Disposable {
         if (alternativeKeymap != null) {
             val mainShortcut = shortcutText(mainKeymap.getKeymap()?.getShortcuts(actionId), mainKeymap.getKind())
             val altShortcutTextFragments = shortcutTextFragments(alternativeKeymap, actionId, mainShortcut)
-            if (altShortcutTextFragments.notEmpty) {
+            if (altShortcutTextFragments.isNotEmpty()) {
                 fragments.addText("&nbsp;(");
                 fragments.addAll(altShortcutTextFragments)
                 fragments.addText(")");
@@ -151,9 +151,12 @@ public class ShortcutPresenter() : Disposable {
         if (shortcutText.isEmpty() || shortcutText == shownShortcut) return fragments
 
         when {
-            keymap.getKind() == KeymapKind.WIN -> fragments.addText(shortcutText)
-            macKeyStokesFont != null && macKeyStokesFont!!.canDisplayUpTo(shortcutText) == -1 -> {
+            keymap.getKind() == KeymapKind.WIN -> {
+                fragments.addText(shortcutText)
                 fragments.add(Pair(shortcutText, macKeyStokesFont))
+            }
+            keymap.getKind() == KeymapKind.MAC ->{
+                fragments.addText(shortcutText)
             }
             else -> {
                 val altShortcutAsWin = shortcutText(keymap.getKeymap()?.getShortcuts(actionId), KeymapKind.WIN)
@@ -177,7 +180,7 @@ public class ShortcutPresenter() : Disposable {
 
     private fun shortcutText(shortcut: Shortcut, keymapKind: KeymapKind) =
         when (shortcut) {
-            is KeyboardShortcut -> array(shortcut.getFirstKeyStroke(), shortcut.getSecondKeyStroke()).filterNotNull().map { shortcutText(it, keymapKind) }.makeString(separator = ", ")
+            is KeyboardShortcut -> arrayOf(shortcut.getFirstKeyStroke(), shortcut.getSecondKeyStroke()).filterNotNull().map { shortcutText(it, keymapKind) }.joinToString(separator = ", ")
             else -> ""
         }
 
@@ -186,11 +189,11 @@ public class ShortcutPresenter() : Disposable {
             KeymapKind.MAC -> MacKeymapUtil.getKeyStrokeText(keystroke) ?: ""
             KeymapKind.WIN -> {
                 val modifiers = keystroke.getModifiers()
-                val tokens = array(
+                val tokens = arrayOf(
                    if (modifiers > 0) getWinModifiersText(modifiers) else null,
                    getWinKeyText(keystroke.getKeyCode())
                 )
-                tokens.filterNotNull().filter {it.isNotEmpty()}.makeString(separator = "+").trim()
+                tokens.filterNotNull().filter {it.isNotEmpty()}.joinToString(separator = "+").trim()
             }
     }
 
