@@ -3,18 +3,17 @@
  */
 package org.nik.presentationAssistant
 
-import java.awt.event.InputEvent
 import com.intellij.openapi.util.text.StringUtil
-import kotlin.properties.Delegates
+import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import java.lang.reflect.Modifier
 
 val inputEventMaskFieldNames by lazy {
-    InputEvent::class.java.getFields()
-            .filter { it.getName()!!.endsWith("_MASK") && !it.getName()!!.endsWith("_DOWN_MASK")
-                      && !it.getName()!!.startsWith("BUTTON")
-                      && Modifier.isStatic(it.getModifiers()) && it.get(null) is Int}
-            .map { Pair(fieldNameToPresentableName(it.getName()!!.removeSuffix("_MASK")), it.get(null) as Int)}
+    InputEvent::class.java.fields
+            .filter { it.name.endsWith("_MASK") && !it.name.endsWith("_DOWN_MASK")
+                      && !it.name.startsWith("BUTTON")
+                      && Modifier.isStatic(it.modifiers) && it.get(null) is Int}
+            .map { Pair(fieldNameToPresentableName(it.name.removeSuffix("_MASK")), it.get(null) as Int)}
 }
 
 fun getWinModifiersText(modifiers: Int) =
@@ -24,11 +23,11 @@ fun getWinModifiersText(modifiers: Int) =
                 .joinToString("+")
 
 val keyEventFieldNames by lazy {
-    KeyEvent::class.java.getFields()
-            .filter { it.getName()!!.startsWith("VK_") && Modifier.isStatic(it.getModifiers()) && it.get(null) is Int}
-            .map { Pair(fieldNameToPresentableName(it.getName()!!.removePrefix("VK_")), it.get(null) as Int)}
+    KeyEvent::class.java.fields
+            .filter { it.name.startsWith("VK_") && Modifier.isStatic(it.modifiers) && it.get(null) is Int}
+            .map { Pair(fieldNameToPresentableName(it.name.removePrefix("VK_")), it.get(null) as Int)}
             .groupBy { it.second }
-            .mapValues { it.value.first()!!.first }
+            .mapValues { it.value.first().first }
 }
 
 fun getWinKeyText(key: Int) =

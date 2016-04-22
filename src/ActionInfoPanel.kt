@@ -3,38 +3,26 @@
  */
 package org.nik.presentationAssistant
 
-import com.intellij.openapi.ui.popup.JBPopupFactory
-import com.intellij.openapi.wm.WindowManager
-import com.intellij.openapi.project.Project
-import java.awt.Point
 import com.intellij.openapi.Disposable
-import java.awt.Color
-import com.intellij.ui.JBColor
-import java.awt.BorderLayout
-import com.intellij.ui.components.panels.NonOpaquePanel
-import java.awt.Font
-import java.awt.FlowLayout
-import com.intellij.ui.awt.RelativePoint
-import com.intellij.openapi.wm.IdeFrame
-import javax.swing.JLabel
-import javax.swing.SwingConstants
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopup
-import com.intellij.openapi.util.Pair as IdeaPair
-import com.intellij.ui.popup.ComponentPopupBuilderImpl
-import java.awt.geom.RoundRectangle2D
-import javax.swing.BorderFactory
-import com.intellij.ui.IdeBorderFactory
-import com.intellij.util.Alarm
-import com.intellij.openapi.util.Disposer
-import javax.swing.JPanel
-import com.intellij.util.ui.Animator
-import com.intellij.util.ui.UIUtil
-import com.intellij.openapi.ui.popup.MaskProvider
+import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.JBPopupListener
 import com.intellij.openapi.ui.popup.LightweightWindowEvent
-import javax.swing.SwingUtilities
-import java.util.ArrayList
-import java.awt.Window
+import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.wm.IdeFrame
+import com.intellij.openapi.wm.WindowManager
+import com.intellij.ui.JBColor
+import com.intellij.ui.awt.RelativePoint
+import com.intellij.ui.components.panels.NonOpaquePanel
+import com.intellij.ui.popup.ComponentPopupBuilderImpl
+import com.intellij.util.Alarm
+import com.intellij.util.ui.Animator
+import com.intellij.util.ui.UIUtil
+import java.awt.*
+import java.util.*
+import javax.swing.*
+import com.intellij.openapi.util.Pair as IdeaPair
 
 val hideDelay = 4*1000
 
@@ -55,10 +43,10 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         val background = JBColor(Color(186, 238, 186, 120), Color(73, 117, 73))
         updateLabelText(project, textFragments)
         setBackground(background)
-        setOpaque(true)
+        isOpaque = true
         add(labelsPanel, BorderLayout.CENTER)
         val emptyBorder = BorderFactory.createEmptyBorder(5, 10, 5, 10)
-        setBorder(emptyBorder)
+        border = emptyBorder
 
 
         hint = with (JBPopupFactory.getInstance()!!.createComponentPopupBuilder(this, this) as ComponentPopupBuilderImpl) {
@@ -108,8 +96,8 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
     }
 
     private fun getHintWindow(): Window? {
-        val window = SwingUtilities.windowForComponent(hint.getContent()!!)
-        if (window != null && window.isShowing()) return window
+        val window = SwingUtilities.windowForComponent(hint.content)
+        if (window != null && window.isShowing) return window
         return null;
     }
 
@@ -127,28 +115,28 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         hideAlarm.addRequest({fadeOut()}, hideDelay)
     }
 
-    public fun updateText(project: Project, textFragments: List<Pair<String, Font?>>) {
+    fun updateText(project: Project, textFragments: List<Pair<String, Font?>>) {
         if (getHintWindow() == null) return
         labelsPanel.removeAll()
         updateLabelText(project, textFragments)
-        hint.getContent()!!.invalidate()
-        val ideFrame = WindowManager.getInstance()!!.getIdeFrame(project)!!
-        hint.setLocation(computeLocation(ideFrame).getScreenPoint())
-        hint.setSize(getPreferredSize()!!)
-        hint.getContent()!!.repaint()
+        hint.content!!.invalidate()
+        val ideFrame = WindowManager.getInstance().getIdeFrame(project)
+        hint.setLocation(computeLocation(ideFrame).screenPoint)
+        hint.size = preferredSize
+        hint.content!!.repaint()
         showFinal()
     }
 
     private fun computeLocation(ideFrame: IdeFrame): RelativePoint {
-        val statusBarHeight = ideFrame.getStatusBar()!!.getComponent()!!.getHeight()
-        val visibleRect = ideFrame.getComponent()!!.getVisibleRect()
-        val popupSize = getPreferredSize()!!
+        val statusBarHeight = ideFrame.statusBar.component.height
+        val visibleRect = ideFrame.component.visibleRect
+        val popupSize = preferredSize
         val point = Point(visibleRect.x + (visibleRect.width - popupSize.width) / 2, visibleRect.y + visibleRect.height - popupSize.height - statusBarHeight - 5)
-        return RelativePoint(ideFrame.getComponent()!!, point)
+        return RelativePoint(ideFrame.component, point)
     }
 
     private fun updateLabelText(project: Project, textFragments: List<Pair<String, Font?>>) {
-        val ideFrame = WindowManager.getInstance()!!.getIdeFrame(project)!!
+        val ideFrame = WindowManager.getInstance().getIdeFrame(project)
         for (label in createLabels(textFragments, ideFrame)) {
             labelsPanel.add(label)
         }
@@ -160,7 +148,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
             if(result.isEmpty()){
                 result.add(item)
             }else {
-                val last = result.last()
+                val last = result.lastOrNull()
                 if (last != null && last.second == item.second) {
                     result.removeAt(result.lastIndex)
                     result.add(Pair(last.first + item.first, last.second))
@@ -174,45 +162,45 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         var fontSize = getPresentationAssistant().configuration.fontSize.toFloat()
         val labels = textFragments.mergeFragments().map {
             val label = JLabel("<html>${it.first}</html>", SwingConstants.CENTER)
-            if (it.second != null) label.setFont(it.second)
+            if (it.second != null) label.font = it.second
             label
         }
         fun setFontSize(size: Float) {
             for (label in labels) {
-                label.setFont(label.getFont()!!.deriveFont(size))
+                label.font = label.font.deriveFont(size)
             }
-            val maxAscent = labels.map { it.getFontMetrics(it.getFont()!!).getMaxAscent() }.max() ?: 0
+            val maxAscent = labels.map { it.getFontMetrics(it.font).maxAscent }.max() ?: 0
             for (label in labels) {
-                val ascent = label.getFontMetrics(label.getFont()!!).getMaxAscent()
+                val ascent = label.getFontMetrics(label.font).maxAscent
                 if (ascent < maxAscent) {
-                    label.setBorder(BorderFactory.createEmptyBorder(maxAscent - ascent, 0, 0, 0))
+                    label.border = BorderFactory.createEmptyBorder(maxAscent - ascent, 0, 0, 0)
                 }
                 else {
-                    label.setBorder(null)
+                    label.border = null
                 }
             }
         }
         setFontSize(fontSize)
-        val frameWidth = ideFrame.getComponent()!!.getWidth()
+        val frameWidth = ideFrame.component.width
         if (frameWidth > 100) {
-            while (labels.map {it.getPreferredSize()!!.width}.sum() > frameWidth - 10 && fontSize > 12) {
+            while (labels.map {it.preferredSize.width}.sum() > frameWidth - 10 && fontSize > 12) {
                 setFontSize(--fontSize)
             }
         }
         return labels
     }
 
-    public fun close() {
+    fun close() {
         Disposer.dispose(this)
     }
 
-    public override fun dispose() {
+    override fun dispose() {
         phase = Phase.HIDDEN
-        if (!hint.isDisposed()) {
+        if (!hint.isDisposed) {
             hint.cancel()
         }
         Disposer.dispose(animator)
     }
 
-    public fun canBeReused(): Boolean = phase == Phase.FADING_IN || phase == Phase.SHOWN
+    fun canBeReused(): Boolean = phase == Phase.FADING_IN || phase == Phase.SHOWN
 }

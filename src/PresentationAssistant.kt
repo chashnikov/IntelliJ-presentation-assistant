@@ -3,40 +3,42 @@
  */
 package org.nik.presentationAssistant
 
-import com.intellij.openapi.components.*
-import com.intellij.util.xmlb.XmlSerializerUtil
-import com.intellij.openapi.options.Configurable
-import javax.swing.JCheckBox
-import com.intellij.util.ui.FormBuilder
 import com.intellij.openapi.application.ApplicationManager
-import javax.swing.JPanel
-import com.intellij.openapi.options.SearchableConfigurable
-import java.awt.BorderLayout
-import javax.swing.JTextField
-import com.intellij.util.ui.UIUtil
-import com.intellij.openapi.ui.ComboBox
-import com.intellij.openapi.keymap.ex.KeymapManagerEx
-import com.intellij.ui.ListCellRendererWrapper
+import com.intellij.openapi.components.ApplicationComponent
+import com.intellij.openapi.components.PersistentStateComponent
+import com.intellij.openapi.components.State
+import com.intellij.openapi.components.Storage
 import com.intellij.openapi.keymap.Keymap
-import javax.swing.JList
 import com.intellij.openapi.keymap.KeymapManager
+import com.intellij.openapi.keymap.ex.KeymapManagerEx
+import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.options.SearchableConfigurable
+import com.intellij.openapi.ui.ComboBox
+import com.intellij.ui.ListCellRendererWrapper
+import com.intellij.util.ui.FormBuilder
+import com.intellij.util.ui.UIUtil
+import com.intellij.util.xmlb.XmlSerializerUtil
+import java.awt.BorderLayout
+import javax.swing.JCheckBox
+import javax.swing.JList
+import javax.swing.JPanel
+import javax.swing.JTextField
 
-public class PresentationAssistantState {
+class PresentationAssistantState {
     var showActionDescriptions = true
     var fontSize = 24
     var mainKeymap = getDefaultMainKeymap()
     var alternativeKeymap = getDefaultAlternativeKeymap()
 }
 
-//todo[nik] report kotlin bug: if PersistentStateComponent is implemented directly IDEA is unable to obtain state class
-@State(name = "PresentationAssistant", storages = arrayOf(Storage(file = "${StoragePathMacros.APP_CONFIG}/presentation-assistant.xml")))
-public class PresentationAssistant : PresentationAssistantBase() {
+@State(name = "PresentationAssistant", storages = arrayOf(Storage(file = "presentation-assistant.xml")))
+class PresentationAssistant : ApplicationComponent, PersistentStateComponent<PresentationAssistantState> {
     val configuration = PresentationAssistantState()
     var presenter: ShortcutPresenter? = null
 
     override fun getState() = configuration
-    override fun loadState(p0: PresentationAssistantState?) {
-        XmlSerializerUtil.copyBean(p0!!, configuration)
+    override fun loadState(p: PresentationAssistantState) {
+        XmlSerializerUtil.copyBean(p, configuration)
     }
     override fun initComponent() {
         if (configuration.showActionDescriptions) {
@@ -66,38 +68,38 @@ public class PresentationAssistant : PresentationAssistantBase() {
 
 fun getPresentationAssistant(): PresentationAssistant = ApplicationManager.getApplication()!!.getComponent(PresentationAssistant::class.java)!!
 
-public class KeymapDescriptionPanel {
+class KeymapDescriptionPanel {
     val combobox : ComboBox
     val text = JTextField(10)
     val mainPanel: JPanel
     init
     {
-        combobox = ComboBox(KeymapManagerEx.getInstanceEx()!!.getAllKeymaps()!!)
-        combobox.setRenderer(object: ListCellRendererWrapper<Keymap>() {
-            override fun customize(jList: JList<*>?, t: Keymap?, i: Int, b: Boolean, b1: Boolean) {
-                setText(t?.getPresentableName() ?: "")
+        combobox = ComboBox(KeymapManagerEx.getInstanceEx().allKeymaps)
+        combobox.renderer = object: ListCellRendererWrapper<Keymap>() {
+            override fun customize(list: JList<*>, t: Keymap?, index: Int, selected: Boolean, hasFocus: Boolean) {
+                setText(t?.presentableName ?: "")
             }
-        })
-        val formBuilder = FormBuilder.createFormBuilder()!!
-                .setIndent(20)!!
-                .addLabeledComponent("Keymap:", combobox)!!
-                .addLabeledComponent("Description:", text)!!
-        mainPanel = formBuilder.getPanel()!!
+        }
+        val formBuilder = FormBuilder.createFormBuilder()
+                .setFormLeftIndent(20)
+                .addLabeledComponent("Keymap:", combobox)
+                .addLabeledComponent("Description:", text)
+        mainPanel = formBuilder.panel
     }
 
-    fun getDescription() = KeymapDescription((combobox.getSelectedItem() as Keymap?)?.getName() ?: "", text.getText()!!)
+    fun getDescription() = KeymapDescription((combobox.selectedItem as Keymap?)?.name ?: "", text.text)
 
     fun setEnabled(enabled: Boolean) {
         UIUtil.setEnabled(mainPanel, enabled, true)
     }
 
     fun reset(config: KeymapDescription) {
-        combobox.setSelectedItem(KeymapManager.getInstance()!!.getKeymap(config.name))
-        text.setText(config.displayText)
+        combobox.selectedItem = KeymapManager.getInstance().getKeymap(config.name)
+        text.text = config.displayText
     }
 }
 
-public class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
+class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
     val configuration: PresentationAssistant = getPresentationAssistant()
     val showActionsCheckbox = JCheckBox(UIUtil.replaceMnemonicAmpersand("&Show action names and shortcuts"))
     val showAltKeymap = JCheckBox("Alternative Keymap:")
@@ -107,52 +109,52 @@ public class PresentationAssistantConfigurable : Configurable, SearchableConfigu
     val mainPanel: JPanel
     init
     {
-        val formBuilder = FormBuilder.createFormBuilder()!!
-                           .addComponent(showActionsCheckbox)!!
-                           .addLabeledComponent("&Font size:", fontSizeField)!!
-                           .addVerticalGap(10)!!
-                           .addLabeledComponent("Main Keymap:", mainKeymapPanel.mainPanel, true)!!
-                           .addLabeledComponent(showAltKeymap, altKeymapPanel.mainPanel, true)!!
+        val formBuilder = FormBuilder.createFormBuilder()
+                           .addComponent(showActionsCheckbox)
+                           .addLabeledComponent("&Font size:", fontSizeField)
+                           .addVerticalGap(10)
+                           .addLabeledComponent("Main Keymap:", mainKeymapPanel.mainPanel, true)
+                           .addLabeledComponent(showAltKeymap, altKeymapPanel.mainPanel, true)
         showActionsCheckbox.addActionListener { updatePanels() }
         showAltKeymap.addActionListener {
-            altKeymapPanel.setEnabled(showAltKeymap.isSelected() && showActionsCheckbox.isSelected())
+            altKeymapPanel.setEnabled(showAltKeymap.isSelected && showActionsCheckbox.isSelected)
         }
         mainPanel = JPanel(BorderLayout())
-        mainPanel.add(BorderLayout.NORTH, formBuilder.getPanel()!!)
+        mainPanel.add(BorderLayout.NORTH, formBuilder.panel)
     }
 
     private fun updatePanels() {
-        val enabled = showActionsCheckbox.isSelected()
-        fontSizeField.setEnabled(enabled)
-        showAltKeymap.setEnabled(enabled)
+        val enabled = showActionsCheckbox.isSelected
+        fontSizeField.isEnabled = enabled
+        showAltKeymap.isEnabled = enabled
         mainKeymapPanel.setEnabled(enabled)
-        altKeymapPanel.setEnabled(enabled && showAltKeymap.isSelected())
+        altKeymapPanel.setEnabled(enabled && showAltKeymap.isSelected)
     }
 
-    override fun getId() = getDisplayName()
-    override fun enableSearch(p0: String?) = null
+    override fun getId() = displayName
+    override fun enableSearch(option: String?) = null
     override fun getDisplayName() = "Presentation Assistant"
-    override fun getHelpTopic(): String? = null
+    override fun getHelpTopic() = null
 
-    override fun createComponent( )= mainPanel
-    override fun isModified() = showActionsCheckbox.isSelected() != configuration.configuration.showActionDescriptions
-                                || fontSizeField.getText() != configuration.configuration.fontSize.toString()
+    override fun createComponent() = mainPanel
+    override fun isModified() = showActionsCheckbox.isSelected != configuration.configuration.showActionDescriptions
+                                || fontSizeField.text != configuration.configuration.fontSize.toString()
                                 || configuration.configuration.mainKeymap != mainKeymapPanel.getDescription()
                                 || configuration.configuration.alternativeKeymap != getAlternativeKeymap()
 
-    fun getAlternativeKeymap() = if (showAltKeymap.isSelected()) altKeymapPanel.getDescription() else null
+    fun getAlternativeKeymap() = if (showAltKeymap.isSelected) altKeymapPanel.getDescription() else null
 
     override fun apply() {
-        configuration.setShowActionsDescriptions(showActionsCheckbox.isSelected())
-        configuration.setFontSize(fontSizeField.getText()!!.trim().toInt())
+        configuration.setShowActionsDescriptions(showActionsCheckbox.isSelected)
+        configuration.setFontSize(fontSizeField.text.trim().toInt())
         configuration.configuration.mainKeymap = mainKeymapPanel.getDescription()
         configuration.configuration.alternativeKeymap = getAlternativeKeymap()
 
     }
     override fun reset() {
-        showActionsCheckbox.setSelected(configuration.configuration.showActionDescriptions)
-        fontSizeField.setText(configuration.configuration.fontSize.toString())
-        showAltKeymap.setSelected(configuration.configuration.alternativeKeymap != null)
+        showActionsCheckbox.isSelected = configuration.configuration.showActionDescriptions
+        fontSizeField.text = configuration.configuration.fontSize.toString()
+        showAltKeymap.isSelected = configuration.configuration.alternativeKeymap != null
         mainKeymapPanel.reset(configuration.configuration.mainKeymap)
         altKeymapPanel.reset(configuration.configuration.alternativeKeymap ?: KeymapDescription("", ""))
         updatePanels()
