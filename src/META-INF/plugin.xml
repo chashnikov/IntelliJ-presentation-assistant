@@ -25,7 +25,7 @@
   <change-notes><![CDATA[
     <ul>
     <li>Rounded corners of popups fixed.</li>
-    <li>'Show action names and shortcuts' option in settings replaced by 'Description of Actions' toggle action in 'View' menu.</li>
+    <li>'Show action names and shortcuts' option in settings replaced by 'Description of Actions' toggle action in 'View' menu (Alt+Shift+D).</li>
     </ul>
 ]]></change-notes>
 
@@ -43,6 +43,7 @@
     <action class="org.nik.presentationAssistant.ShowActionDescriptionsToggleAction"
             id="presentationAssistant.ShowActionDescriptions">
       <add-to-group group-id="UIToggleActions" anchor="last"/>
+      <keyboard-shortcut first-keystroke="alt shift d" keymap="$default"/>
     </action>
   </actions>
 </idea-plugin>
