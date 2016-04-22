@@ -25,6 +25,7 @@
   <change-notes><![CDATA[
     <ul>
     <li>Rounded corners of popups fixed.</li>
+    <li>'Show action names and shortcuts' option in settings replaced by 'Description of Actions' toggle action in 'View' menu.</li>
     </ul>
 ]]></change-notes>
 
@@ -38,4 +39,10 @@
   <extensions defaultExtensionNs="com.intellij">
       <applicationConfigurable groupId="appearance" groupWeight="-15" instance="org.nik.presentationAssistant.PresentationAssistantConfigurable"/>
   </extensions>
+  <actions>
+    <action class="org.nik.presentationAssistant.ShowActionDescriptionsToggleAction"
+            id="presentationAssistant.ShowActionDescriptions">
+      <add-to-group group-id="UIToggleActions" anchor="last"/>
+    </action>
+  </actions>
 </idea-plugin>

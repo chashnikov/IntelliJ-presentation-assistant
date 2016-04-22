@@ -117,7 +117,6 @@ class KeymapDescriptionPanel {
 
 class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
     val configuration: PresentationAssistant = getPresentationAssistant()
-    val showActionsCheckbox = JCheckBox(UIUtil.replaceMnemonicAmpersand("&Show action names and shortcuts"))
     val showAltKeymap = JCheckBox("Alternative Keymap:")
     val mainKeymapPanel = KeymapDescriptionPanel()
     val altKeymapPanel = KeymapDescriptionPanel()
@@ -126,25 +125,19 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
     init
     {
         val formBuilder = FormBuilder.createFormBuilder()
-                           .addComponent(showActionsCheckbox)
                            .addLabeledComponent("&Font size:", fontSizeField)
                            .addVerticalGap(10)
                            .addLabeledComponent("Main Keymap:", mainKeymapPanel.mainPanel, true)
                            .addLabeledComponent(showAltKeymap, altKeymapPanel.mainPanel, true)
-        showActionsCheckbox.addActionListener { updatePanels() }
         showAltKeymap.addActionListener {
-            altKeymapPanel.setEnabled(showAltKeymap.isSelected && showActionsCheckbox.isSelected)
+            altKeymapPanel.setEnabled(showAltKeymap.isSelected)
         }
         mainPanel = JPanel(BorderLayout())
         mainPanel.add(BorderLayout.NORTH, formBuilder.panel)
     }
 
     private fun updatePanels() {
-        val enabled = showActionsCheckbox.isSelected
-        fontSizeField.isEnabled = enabled
-        showAltKeymap.isEnabled = enabled
-        mainKeymapPanel.setEnabled(enabled)
-        altKeymapPanel.setEnabled(enabled && showAltKeymap.isSelected)
+        altKeymapPanel.setEnabled(showAltKeymap.isSelected)
     }
 
     override fun getId() = displayName
@@ -153,22 +146,19 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
     override fun getHelpTopic() = null
 
     override fun createComponent() = mainPanel
-    override fun isModified() = showActionsCheckbox.isSelected != configuration.configuration.showActionDescriptions
-                                || fontSizeField.text != configuration.configuration.fontSize.toString()
+    override fun isModified() = fontSizeField.text != configuration.configuration.fontSize.toString()
                                 || configuration.configuration.mainKeymap != mainKeymapPanel.getDescription()
                                 || configuration.configuration.alternativeKeymap != getAlternativeKeymap()
 
     fun getAlternativeKeymap() = if (showAltKeymap.isSelected) altKeymapPanel.getDescription() else null
 
     override fun apply() {
-        configuration.setShowActionsDescriptions(showActionsCheckbox.isSelected)
         configuration.setFontSize(fontSizeField.text.trim().toInt())
         configuration.configuration.mainKeymap = mainKeymapPanel.getDescription()
         configuration.configuration.alternativeKeymap = getAlternativeKeymap()
 
     }
     override fun reset() {
-        showActionsCheckbox.isSelected = configuration.configuration.showActionDescriptions
         fontSizeField.text = configuration.configuration.fontSize.toString()
         showAltKeymap.isSelected = configuration.configuration.alternativeKeymap != null
         mainKeymapPanel.reset(configuration.configuration.mainKeymap)
