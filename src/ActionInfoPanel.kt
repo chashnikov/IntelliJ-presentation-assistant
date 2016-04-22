@@ -38,12 +38,7 @@ import java.awt.Window
 
 val hideDelay = 4*1000
 
-fun ComponentPopupBuilderImpl.mySetMaskProvider(provider: MaskProvider) {
-    try {
-        javaClass<ComponentPopupBuilderImpl>().getMethod("setMaskProvider", javaClass<MaskProvider>()).invoke(this, provider)
-    } catch(ignored: NoSuchMethodError) {
-    }
-}
+
 
 class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>) : NonOpaquePanel(BorderLayout()), Disposable {
     private val hint: JBPopup
@@ -52,8 +47,8 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
     private var animator: Animator
     private var phase = Phase.FADING_IN
     private val hintAlpha = if (UIUtil.isUnderDarcula()) 0.05.toFloat() else 0.1.toFloat()
-    enum class Phase { FADING_IN; SHOWN; FADING_OUT; HIDDEN}
-
+    enum class Phase { FADING_IN, SHOWN, FADING_OUT, HIDDEN}
+    init
     {
         val ideFrame = WindowManager.getInstance()!!.getIdeFrame(project)!!
         labelsPanel = NonOpaquePanel(FlowLayout(FlowLayout.CENTER, 0, 0))
@@ -62,21 +57,12 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         setBackground(background)
         setOpaque(true)
         add(labelsPanel, BorderLayout.CENTER)
-        val useRoundedBorder = useRoundedBorder()
-        val arcSize = 15
         val emptyBorder = BorderFactory.createEmptyBorder(5, 10, 5, 10)
-        if (useRoundedBorder) {
-            setBorder(BorderFactory.createCompoundBorder(IdeBorderFactory.createRoundedBorder(arcSize), emptyBorder))
-        }
-        else {
-            setBorder(emptyBorder)
-        }
+        setBorder(emptyBorder)
+
 
         hint = with (JBPopupFactory.getInstance()!!.createComponentPopupBuilder(this, this) as ComponentPopupBuilderImpl) {
             setAlpha(1.0.toFloat())
-            if (useRoundedBorder) {
-                mySetMaskProvider(MaskProvider({ RoundRectangle2D.Double(1.0, 1.0, it!!.getWidth()-2, it.getHeight()-2, arcSize.toDouble(), arcSize.toDouble()) }))
-            }
             setFocusable(false)
             setBelongsToGlobalPopupStack(false)
             setCancelKeyEnabled(false)
@@ -95,16 +81,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         animator.resume()
     }
 
-    private fun useRoundedBorder(): Boolean {
-        try {
-            javaClass<ComponentPopupBuilderImpl>().getMethod("setMaskProvider", javaClass<MaskProvider>())
-            return true
-        }
-        catch(ignored: NoSuchMethodException) {
-            return false
-        }
-    }
-    
+
     private fun fadeOut() {
         if (phase != Phase.SHOWN) return
         phase = Phase.FADING_OUT
@@ -180,13 +157,14 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
     private fun List<Pair<String, Font?>>.mergeFragments() : List<Pair<String, Font?>> {
         var result = ArrayList<Pair<String, Font?>>()
         for (item in this) {
-            val last = result.last
-            if (last != null && last.second == item.second) {
-                result.remove(result.lastIndex)
-                result.add(Pair(last.first + item.first, last.second))
-            }
-            else {
+            if(result.isEmpty()){
                 result.add(item)
+            }else {
+                val last = result.last()
+                if (last != null && last.second == item.second) {
+                    result.removeAt(result.lastIndex)
+                    result.add(Pair(last.first + item.first, last.second))
+                }
             }
         }
         return result

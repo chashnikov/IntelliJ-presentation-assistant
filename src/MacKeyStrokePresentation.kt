@@ -12,13 +12,13 @@ import java.awt.GraphicsEnvironment
 
 val LOG = Logger.getInstance("#org.nik.presentationAssistant.MacKeyStrokePresentation")
 
-val macKeyStokesFont by Delegates.lazy {
+val macKeyStokesFont by lazy {
     GraphicsEnvironment.getLocalGraphicsEnvironment()!!.getAllFonts()!!
             .minBy { getNonDisplayableMacSymbols(it).size }
 }
 
 fun getNonDisplayableMacSymbols(font: Font) =
-        javaClass<MacKeymapUtil>().getDeclaredFields()
-                .filter { it.getType() == javaClass<String>() && it.getName() != "APPLE"
+        MacKeymapUtil::class.java.getDeclaredFields()
+                .filter { it.getType() == String::class.java && it.getName() != "APPLE"
                           && font.canDisplayUpTo(it.get(null) as String) != -1 }
                 .map { it.getName()!! }

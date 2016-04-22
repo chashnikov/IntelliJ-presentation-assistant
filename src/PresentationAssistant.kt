@@ -29,14 +29,14 @@ public class PresentationAssistantState {
 }
 
 //todo[nik] report kotlin bug: if PersistentStateComponent is implemented directly IDEA is unable to obtain state class
-State(name = "PresentationAssistant", storages = array(Storage(file = "${StoragePathMacros.APP_CONFIG}/presentation-assistant.xml")))
+@State(name = "PresentationAssistant", storages = arrayOf(Storage(file = "${StoragePathMacros.APP_CONFIG}/presentation-assistant.xml")))
 public class PresentationAssistant : PresentationAssistantBase() {
     val configuration = PresentationAssistantState()
     var presenter: ShortcutPresenter? = null
 
     override fun getState() = configuration
     override fun loadState(p0: PresentationAssistantState?) {
-        XmlSerializerUtil.copyBean(p0, configuration)
+        XmlSerializerUtil.copyBean(p0!!, configuration)
     }
     override fun initComponent() {
         if (configuration.showActionDescriptions) {
@@ -64,16 +64,17 @@ public class PresentationAssistant : PresentationAssistantBase() {
     }
 }
 
-fun getPresentationAssistant(): PresentationAssistant = ApplicationManager.getApplication()!!.getComponent(javaClass<PresentationAssistant>())!!
+fun getPresentationAssistant(): PresentationAssistant = ApplicationManager.getApplication()!!.getComponent(PresentationAssistant::class.java)!!
 
 public class KeymapDescriptionPanel {
     val combobox : ComboBox
     val text = JTextField(10)
     val mainPanel: JPanel
+    init
     {
         combobox = ComboBox(KeymapManagerEx.getInstanceEx()!!.getAllKeymaps()!!)
         combobox.setRenderer(object: ListCellRendererWrapper<Keymap>() {
-            override fun customize(jList: JList?, t: Keymap?, i: Int, b: Boolean, b1: Boolean) {
+            override fun customize(jList: JList<*>?, t: Keymap?, i: Int, b: Boolean, b1: Boolean) {
                 setText(t?.getPresentableName() ?: "")
             }
         })
@@ -104,6 +105,7 @@ public class PresentationAssistantConfigurable : Configurable, SearchableConfigu
     val altKeymapPanel = KeymapDescriptionPanel()
     val fontSizeField = JTextField(5)
     val mainPanel: JPanel
+    init
     {
         val formBuilder = FormBuilder.createFormBuilder()!!
                            .addComponent(showActionsCheckbox)!!
