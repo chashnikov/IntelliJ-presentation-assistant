@@ -3,6 +3,7 @@
   <name>Presentation Assistant</name>
   <version>0.9.7</version>
   <vendor>Nikolay Chashnikov</vendor>
+  <idea-version since-build="145.1" until-build="162.*"/>
 
   <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (Settings | Presentation Assistant) ]]></description>
   <change-notes><![CDATA[
@@ -21,6 +22,6 @@
       </component>
   </application-components>
   <extensions defaultExtensionNs="com.intellij">
-      <applicationConfigurable instance="org.nik.presentationAssistant.PresentationAssistantConfigurable"/>
+      <applicationConfigurable groupId="appearance" groupWeight="-15" instance="org.nik.presentationAssistant.PresentationAssistantConfigurable"/>
   </extensions>
 </idea-plugin>
