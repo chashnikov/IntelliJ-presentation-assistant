@@ -17,9 +17,9 @@
 <idea-plugin version="2">
   <id>org.nik.presentation-assistant</id>
   <name>Presentation Assistant</name>
-  <version>0.9.7</version>
+  <version>0.9.8</version>
   <vendor>Nikolay Chashnikov</vendor>
-  <idea-version since-build="145.1" until-build="162.*"/>
+  <idea-version since-build="145.1" until-build="163.*"/>
 
   <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (Settings | Presentation Assistant) ]]></description>
   <change-notes><![CDATA[
@@ -27,8 +27,6 @@
     <li>Keymaps used in notifications can be configured in Settings</li>
     </ul>
 ]]></change-notes>
-
-  <idea-version since-build="107.105"/>
 
   <depends>com.intellij.modules.lang</depends>
 
