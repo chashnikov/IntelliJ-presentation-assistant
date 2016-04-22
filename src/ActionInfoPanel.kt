@@ -38,7 +38,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
     enum class Phase { FADING_IN, SHOWN, FADING_OUT, HIDDEN}
     init
     {
-        val ideFrame = WindowManager.getInstance()!!.getIdeFrame(project)!!
+        val ideFrame = WindowManager.getInstance().getIdeFrame(project)
         labelsPanel = NonOpaquePanel(FlowLayout(FlowLayout.CENTER, 0, 0))
         val background = JBColor(Color(186, 238, 186, 120), Color(73, 117, 73))
         updateLabelText(project, textFragments)
@@ -49,7 +49,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         border = emptyBorder
 
 
-        hint = with (JBPopupFactory.getInstance()!!.createComponentPopupBuilder(this, this) as ComponentPopupBuilderImpl) {
+        hint = with (JBPopupFactory.getInstance().createComponentPopupBuilder(this, this) as ComponentPopupBuilderImpl) {
             setAlpha(1.0.toFloat())
             setFocusable(false)
             setBelongsToGlobalPopupStack(false)
@@ -104,7 +104,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
     private fun setAlpha(alpha: Float) {
         val window = getHintWindow()
         if (window != null) {
-            WindowManager.getInstance()!!.setAlphaModeRatio(window, alpha)
+            WindowManager.getInstance().setAlphaModeRatio(window, alpha)
         }
     }
 
@@ -119,11 +119,11 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         if (getHintWindow() == null) return
         labelsPanel.removeAll()
         updateLabelText(project, textFragments)
-        hint.content!!.invalidate()
+        hint.content.invalidate()
         val ideFrame = WindowManager.getInstance().getIdeFrame(project)
         hint.setLocation(computeLocation(ideFrame).screenPoint)
         hint.size = preferredSize
-        hint.content!!.repaint()
+        hint.content.repaint()
         showFinal()
     }
 

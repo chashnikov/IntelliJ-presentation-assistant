@@ -12,7 +12,7 @@ val macKeyStokesFont by lazy {
             .minBy { getNonDisplayableMacSymbols(it).size }
 }
 
-fun getNonDisplayableMacSymbols(font: Font) =
+private fun getNonDisplayableMacSymbols(font: Font) =
         MacKeymapUtil::class.java.declaredFields
                 .filter { it.type == String::class.java && it.name != "APPLE"
                           && font.canDisplayUpTo(it.get(null) as String) != -1 }

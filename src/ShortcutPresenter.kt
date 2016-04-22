@@ -77,9 +77,9 @@ class ShortcutPresenter() : Disposable {
                 }
             }
 
-            override fun afterActionPerformed(action: AnAction?, dataContext: DataContext?, event: AnActionEvent?) {
+            override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
                 val actionData = currentAction
-                val actionId = ActionManager.getInstance().getId(action!!)
+                val actionId = ActionManager.getInstance().getId(action)
                 if (actionData != null && actionData.actionId == actionId) {
                     showActionInfo(actionData)
                 }

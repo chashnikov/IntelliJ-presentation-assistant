@@ -3,12 +3,12 @@
  */
 package org.nik.presentationAssistant
 
-import com.intellij.util.PlatformUtils
-import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.keymap.KeymapManager
+import com.intellij.openapi.util.SystemInfo
+import com.intellij.util.PlatformUtils
 
-private val winKeymap = KeymapManager.getInstance()!!.getKeymap(KeymapKind.WIN.defaultKeymapName)
-private val macKeymap = KeymapManager.getInstance()!!.getKeymap(KeymapKind.MAC.defaultKeymapName);
+private val winKeymap = KeymapManager.getInstance().getKeymap(KeymapKind.WIN.defaultKeymapName)
+private val macKeymap = KeymapManager.getInstance().getKeymap(KeymapKind.MAC.defaultKeymapName);
 
 enum class KeymapKind(val displayName: String, val defaultKeymapName: String) {
     WIN("Win/Linux", "\$default"),
@@ -32,7 +32,7 @@ fun KeymapKind.getKeymap() = when (this) {
 
 class KeymapDescription(var name: String = "", var displayText: String = "") {
     fun getKind() = if (name.contains("Mac OS")) KeymapKind.MAC else KeymapKind.WIN
-    fun getKeymap() = KeymapManager.getInstance()!!.getKeymap(name)
+    fun getKeymap() = KeymapManager.getInstance().getKeymap(name)
 
     override fun equals(other: Any?): Boolean {
         return other is KeymapDescription && other.name == name && other.displayText == displayText

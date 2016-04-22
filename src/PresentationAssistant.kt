@@ -66,7 +66,7 @@ class PresentationAssistant : ApplicationComponent, PersistentStateComponent<Pre
     }
 }
 
-fun getPresentationAssistant(): PresentationAssistant = ApplicationManager.getApplication()!!.getComponent(PresentationAssistant::class.java)!!
+fun getPresentationAssistant(): PresentationAssistant = ApplicationManager.getApplication().getComponent(PresentationAssistant::class.java)
 
 class KeymapDescriptionPanel {
     val combobox : ComboBox
