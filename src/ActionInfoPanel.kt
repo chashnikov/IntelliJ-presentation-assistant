@@ -145,14 +145,13 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
     private fun List<Pair<String, Font?>>.mergeFragments() : List<Pair<String, Font?>> {
         var result = ArrayList<Pair<String, Font?>>()
         for (item in this) {
-            if(result.isEmpty()){
+            val last = result.lastOrNull()
+            if (last != null && last.second == item.second) {
+                result.removeAt(result.lastIndex)
+                result.add(Pair(last.first + item.first, last.second))
+            }
+            else {
                 result.add(item)
-            }else {
-                val last = result.lastOrNull()
-                if (last != null && last.second == item.second) {
-                    result.removeAt(result.lastIndex)
-                    result.add(Pair(last.first + item.first, last.second))
-                }
             }
         }
         return result
