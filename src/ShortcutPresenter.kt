@@ -10,6 +10,7 @@ import com.intellij.openapi.keymap.MacKeymapUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.util.SystemInfo
 import java.awt.Font
 import java.util.*
 import javax.swing.KeyStroke
@@ -140,11 +141,10 @@ class ShortcutPresenter() : Disposable {
         if (shortcutText.isEmpty() || shortcutText == shownShortcut) return fragments
 
         when {
-            keymap.getKind() == KeymapKind.WIN -> {
+            keymap.getKind() == KeymapKind.WIN || SystemInfo.isMac -> {
                 fragments.addText(shortcutText)
-                fragments.add(Pair(shortcutText, macKeyStokesFont))
             }
-            keymap.getKind() == KeymapKind.MAC ->{
+            getMacKeyStokesFont() != null && getMacKeyStokesFont()!!.canDisplayUpTo(shortcutText) == -1 -> {
                 fragments.addText(shortcutText)
             }
             else -> {

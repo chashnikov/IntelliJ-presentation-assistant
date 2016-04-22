@@ -7,9 +7,24 @@ import com.intellij.openapi.keymap.MacKeymapUtil
 import java.awt.Font
 import java.awt.GraphicsEnvironment
 
+/*
 val macKeyStokesFont by lazy {
-    GraphicsEnvironment.getLocalGraphicsEnvironment().allFonts
-            .minBy { getNonDisplayableMacSymbols(it).size }
+    computeMacKeyStokesFont()
+}
+*/
+
+private fun computeMacKeyStokesFont() =
+        GraphicsEnvironment.getLocalGraphicsEnvironment().allFonts
+        .minBy { getNonDisplayableMacSymbols(it).size }
+
+private var macKeyStokesFont: Font? = null
+private var macKeyStokesFontComputed: Boolean = false
+fun getMacKeyStokesFont(): Font? {
+    if (!macKeyStokesFontComputed) {
+        macKeyStokesFont = computeMacKeyStokesFont()
+        macKeyStokesFontComputed = true
+    }
+    return macKeyStokesFont
 }
 
 private fun getNonDisplayableMacSymbols(font: Font) =

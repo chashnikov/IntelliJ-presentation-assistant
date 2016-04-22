@@ -8,24 +8,49 @@ import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import java.lang.reflect.Modifier
 
-val inputEventMaskFieldNames by lazy {
-    InputEvent::class.java.fields
-            .filter { it.name.endsWith("_MASK") && !it.name.endsWith("_DOWN_MASK")
-                      && !it.name.startsWith("BUTTON")
-                      && Modifier.isStatic(it.modifiers) && it.get(null) is Int}
-            .map { Pair(fieldNameToPresentableName(it.name.removeSuffix("_MASK")), it.get(null) as Int)}
+//val inputEventMaskFieldNames by lazy { computeEventMaskFieldNames() }
+private var inputEventMaskFieldNames: List<Pair<String, Int>>? = null
+
+private fun getInputEventMaskFieldNames(): List<Pair<String, Int>> {
+    if (inputEventMaskFieldNames == null) {
+        inputEventMaskFieldNames = computeEventMaskFieldNames()
+    }
+    return inputEventMaskFieldNames!!
 }
 
+private fun computeEventMaskFieldNames() =
+        InputEvent::class.java.fields
+        .filter {
+            it.name.endsWith("_MASK") && !it.name.endsWith("_DOWN_MASK")
+                    && !it.name.startsWith("BUTTON")
+                    && Modifier.isStatic(it.modifiers) && it.get(null) is Int
+        }
+        .map { Pair(fieldNameToPresentableName(it.name.removeSuffix("_MASK")), it.get(null) as Int) }
+
 fun getWinModifiersText(modifiers: Int) =
-        inputEventMaskFieldNames
+        getInputEventMaskFieldNames()
                 .filter { modifiers and (it.second) != 0}
                 .map { it.first }
                 .joinToString("+")
 
+/*
 val keyEventFieldNames by lazy {
-    KeyEvent::class.java.fields
-            .filter { it.name.startsWith("VK_") && Modifier.isStatic(it.modifiers) && it.get(null) is Int}
-            .map { Pair(fieldNameToPresentableName(it.name.removePrefix("VK_")), it.get(null) as Int)}
+    computeKeyEventFieldNames()
+}
+*/
+
+private var keyEventFieldNamesCached: Map<Int, String>? = null
+private fun getKeyEventFieldNames(): Map<Int, String> {
+    if (keyEventFieldNamesCached == null) {
+        keyEventFieldNamesCached = computeKeyEventFieldNames()
+    }
+    return keyEventFieldNamesCached!!
+}
+
+private fun computeKeyEventFieldNames(): Map<Int, String> {
+    return KeyEvent::class.java.fields
+            .filter { it.name.startsWith("VK_") && Modifier.isStatic(it.modifiers) && it.get(null) is Int }
+            .map { Pair(fieldNameToPresentableName(it.name.removePrefix("VK_")), it.get(null) as Int) }
             .groupBy { it.second }
             .mapValues { it.value.first().first }
 }
@@ -39,7 +64,7 @@ fun getWinKeyText(key: Int) =
         KeyEvent.VK_SUBTRACT -> "NumPad -"
         KeyEvent.VK_DECIMAL -> "NumPad ."
         KeyEvent.VK_DIVIDE -> "NumPad /"
-        in keyEventFieldNames.keys -> keyEventFieldNames[key]
+        in getKeyEventFieldNames().keys -> getKeyEventFieldNames()[key]
         else -> "Unknown key 0x${Integer.toHexString(key)}"
     }
         
