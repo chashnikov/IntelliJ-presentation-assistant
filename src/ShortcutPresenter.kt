@@ -144,7 +144,7 @@ class ShortcutPresenter() : Disposable {
             keymap.getKind() == KeymapKind.WIN || SystemInfo.isMac -> {
                 fragments.addText(shortcutText)
             }
-            macKeyStokesFont != null && macKeyStokesFont!!.canDisplayUpTo(shortcutText) == -1 -> {
+            macKeyStrokesFont != null && macKeyStrokesFont!!.canDisplayUpTo(shortcutText) == -1 -> {
                 fragments.addText(shortcutText)
             }
             else -> {

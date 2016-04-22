@@ -7,7 +7,7 @@ import com.intellij.openapi.keymap.MacKeymapUtil
 import java.awt.Font
 import java.awt.GraphicsEnvironment
 
-val macKeyStokesFont by lazy {
+val macKeyStrokesFont by lazy {
     GraphicsEnvironment.getLocalGraphicsEnvironment().allFonts
     .minBy { getNonDisplayableMacSymbols(it).size }
 }
