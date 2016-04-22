@@ -21,10 +21,10 @@
   <vendor>Nikolay Chashnikov</vendor>
   <idea-version since-build="145.1" until-build="163.*"/>
 
-  <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (Settings | Presentation Assistant) ]]></description>
+  <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (Settings | Appearance & Behavior | Presentation Assistant) ]]></description>
   <change-notes><![CDATA[
     <ul>
-    <li>Keymaps used in notifications can be configured in Settings</li>
+    <li>Rounded corners of popups fixed.</li>
     </ul>
 ]]></change-notes>
 
