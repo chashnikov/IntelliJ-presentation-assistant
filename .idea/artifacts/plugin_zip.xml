@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="plugin.zip">
+    <output-path>$PROJECT_DIR$/out/artifacts/plugin_zip</output-path>
+    <root id="archive" name="presentationAssistant.zip">
+      <element id="directory" name="presentationAssistant">
+        <element id="directory" name="lib">
+          <element id="archive" name="presentationAssistant.jar">
+            <element id="module-output" name="presentationAssistant" />
+          </element>
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
