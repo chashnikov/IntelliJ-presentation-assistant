@@ -161,7 +161,7 @@ class ShortcutPresenter() : Disposable {
                 fragments.addText(shortcutText)
             }
             macKeyStrokesFont != null && macKeyStrokesFont!!.canDisplayUpTo(shortcutText) == -1 -> {
-                fragments.addText(shortcutText)
+                fragments.add(Pair(shortcutText, macKeyStrokesFont))
             }
             else -> {
                 val altShortcutAsWin = shortcutText(keymap.getKeymap()?.getShortcuts(actionId), KeymapKind.WIN)
