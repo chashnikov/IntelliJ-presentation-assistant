@@ -29,6 +29,7 @@ import com.intellij.openapi.keymap.KeymapManager
 import com.intellij.openapi.keymap.ex.KeymapManagerEx
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.options.SearchableConfigurable
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.ListCellRendererWrapper
 import com.intellij.util.ui.FormBuilder
@@ -66,10 +67,12 @@ class PresentationAssistant : ApplicationComponent, PersistentStateComponent<Pre
     }
     override fun getComponentName() = "PresentationAssistant"
 
-    fun setShowActionsDescriptions(value: Boolean) {
+    fun setShowActionsDescriptions(value: Boolean, project: Project?) {
         configuration.showActionDescriptions = value
         if (value && presenter == null) {
-            presenter = ShortcutPresenter()
+            presenter = ShortcutPresenter().apply {
+                showActionInfo(ShortcutPresenter.ActionData("presentationAssistant.ShowActionDescriptions", project, "Show Descriptions of Actions"))
+            }
         }
         if (!value && presenter != null) {
             presenter?.disable()

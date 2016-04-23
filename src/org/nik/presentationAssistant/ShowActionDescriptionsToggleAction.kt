@@ -25,6 +25,6 @@ class ShowActionDescriptionsToggleAction : ToggleAction("Descriptions of Actions
     override fun isSelected(e: AnActionEvent) = getPresentationAssistant().configuration.showActionDescriptions
 
     override fun setSelected(e: AnActionEvent, state: Boolean) {
-        getPresentationAssistant().setShowActionsDescriptions(state)
+        getPresentationAssistant().setShowActionsDescriptions(state, e.project)
     }
 }
