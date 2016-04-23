@@ -1,8 +1,3 @@
-package org.nik.presentationAssistant
-
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.ToggleAction
-
 /*
  * Copyright 2000-2016 Nikolay Chashnikov.
  *
@@ -18,6 +13,10 @@ import com.intellij.openapi.actionSystem.ToggleAction
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.nik.presentationAssistant
+
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.ToggleAction
 
 /**
  * @author nik
