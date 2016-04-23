@@ -83,18 +83,18 @@ class ShortcutPresenter() : Disposable {
         actionManager.addAnActionListener(object: AnActionListener {
             var currentAction: ActionData? = null
 
-            override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
+            override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent?) {
                 currentAction = null
                 val actionId = ActionManager.getInstance().getId(action) ?: return
 
-                if (!movingActions.contains(actionId) && !typingActions.contains(actionId)) {
+                if (!movingActions.contains(actionId) && !typingActions.contains(actionId) && event != null) {
                     val project = event.project
                     val text = event.presentation.text
                     currentAction = ActionData(actionId, project, text)
                 }
             }
 
-            override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
+            override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent?) {
                 val actionData = currentAction
                 val actionId = ActionManager.getInstance().getId(action)
                 if (actionData != null && actionData.actionId == actionId) {
