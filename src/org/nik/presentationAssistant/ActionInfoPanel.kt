@@ -112,6 +112,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
     }
 
     private fun getHintWindow(): Window? {
+        if (hint.isDisposed) return null
         val window = SwingUtilities.windowForComponent(hint.content)
         if (window != null && window.isShowing) return window
         return null;
