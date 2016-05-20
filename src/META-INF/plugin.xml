@@ -17,15 +17,14 @@
 <idea-plugin version="2">
   <id>org.nik.presentation-assistant</id>
   <name>Presentation Assistant</name>
-  <version>1.0.0</version>
+  <version>0.9.9</version>
   <vendor>Nikolay Chashnikov</vendor>
   <idea-version since-build="145.1" until-build="163.*"/>
 
-  <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (View | Description of Action) ]]></description>
+  <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (View | Descriptions of Actions) ]]></description>
   <change-notes><![CDATA[
     <ul>
-    <li>Rounded corners of popups fixed.</li>
-    <li>'Show action names and shortcuts' option in settings replaced by 'Description of Actions' toggle action in 'View' menu (Alt+Shift+D).</li>
+    <li>Some exceptions fixed.</li>
     </ul>
 ]]></change-notes>
 
