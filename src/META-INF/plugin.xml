@@ -17,11 +17,11 @@
 <idea-plugin version="2">
   <id>org.nik.presentation-assistant</id>
   <name>Presentation Assistant</name>
-  <version>0.9.8</version>
+  <version>1.0.0</version>
   <vendor>Nikolay Chashnikov</vendor>
   <idea-version since-build="145.1" until-build="163.*"/>
 
-  <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (View | Descripton of Action) ]]></description>
+  <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (View | Description of Action) ]]></description>
   <change-notes><![CDATA[
     <ul>
     <li>Rounded corners of popups fixed.</li>
