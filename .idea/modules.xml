@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/presentationAssistant.iml" filepath="$PROJECT_DIR$/presentationAssistant.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/presentation-assistant.iml" filepath="$PROJECT_DIR$/.idea/modules/presentation-assistant.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/presentation-assistant_main.iml" filepath="$PROJECT_DIR$/.idea/modules/presentation-assistant_main.iml" group="presentation-assistant" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/presentation-assistant_test.iml" filepath="$PROJECT_DIR$/.idea/modules/presentation-assistant_test.iml" group="presentation-assistant" />
     </modules>
   </component>
 </project>
