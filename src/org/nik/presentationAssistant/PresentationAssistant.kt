@@ -88,7 +88,7 @@ class PresentationAssistant : ApplicationComponent, PersistentStateComponent<Pre
 fun getPresentationAssistant(): PresentationAssistant = ApplicationManager.getApplication().getComponent(PresentationAssistant::class.java)
 
 class KeymapDescriptionPanel {
-    val combobox : ComboBox
+    val combobox : ComboBox<Keymap>
     val text = JTextField(10)
     val mainPanel: JPanel
     init
