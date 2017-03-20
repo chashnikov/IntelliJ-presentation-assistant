@@ -13,7 +13,7 @@ buildscript {
 }
 
 plugins {
-    id 'org.jetbrains.intellij' version "0.1.10"
+    id 'org.jetbrains.intellij' version "0.2.5"
 }
 
 allprojects {
@@ -21,6 +21,13 @@ allprojects {
     apply plugin: 'kotlin'
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
+
+    compileKotlin {
+        kotlinOptions {
+            languageVersion = '1.1'
+            apiVersion = '1.0'
+        }
+    }
 
     sourceSets {
         main {
@@ -35,7 +42,7 @@ allprojects {
         version ideaVersion
         pluginName 'Presentation Assistant'
         updateSinceUntilBuild false
-        publish {
+        publishPlugin {
             username publishUsername
             password publishPassword
         }
