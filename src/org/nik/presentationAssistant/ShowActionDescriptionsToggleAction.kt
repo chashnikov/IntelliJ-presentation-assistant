@@ -17,11 +17,12 @@ package org.nik.presentationAssistant
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.ToggleAction
+import com.intellij.openapi.project.DumbAware
 
 /**
  * @author nik
  */
-class ShowActionDescriptionsToggleAction : ToggleAction("Descriptions of Actions") {
+class ShowActionDescriptionsToggleAction : ToggleAction("Descriptions of Actions"), DumbAware {
     override fun isSelected(e: AnActionEvent) = getPresentationAssistant().configuration.showActionDescriptions
 
     override fun setSelected(e: AnActionEvent, state: Boolean) {
