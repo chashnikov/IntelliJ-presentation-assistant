@@ -44,6 +44,7 @@ import javax.swing.JTextField
 class PresentationAssistantState {
     var showActionDescriptions = true
     var fontSize = 24
+    var hideDelay = 4*1000
     var mainKeymap = getDefaultMainKeymap()
     var alternativeKeymap = getDefaultAlternativeKeymap()
 }
@@ -82,6 +83,10 @@ class PresentationAssistant : ApplicationComponent, PersistentStateComponent<Pre
 
     fun setFontSize(value: Int) {
         configuration.fontSize = value
+    }
+
+    fun setHideDelay(value: Int) {
+        configuration.hideDelay = value
     }
 }
 
@@ -124,11 +129,13 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
     val mainKeymapPanel = KeymapDescriptionPanel()
     val altKeymapPanel = KeymapDescriptionPanel()
     val fontSizeField = JTextField(5)
+    val hideDelayField = JTextField(5)
     val mainPanel: JPanel
     init
     {
         val formBuilder = FormBuilder.createFormBuilder()
                            .addLabeledComponent("&Font size:", fontSizeField)
+                           .addLabeledComponent("&Display duration (in ms):", hideDelayField)
                            .addVerticalGap(10)
                            .addLabeledComponent("Main Keymap:", mainKeymapPanel.mainPanel, true)
                            .addLabeledComponent(showAltKeymap, altKeymapPanel.mainPanel, true)
@@ -149,7 +156,8 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
     override fun getHelpTopic() = null
 
     override fun createComponent() = mainPanel
-    override fun isModified() = fontSizeField.text != configuration.configuration.fontSize.toString()
+    override fun isModified() = isDigitsOnly(fontSizeField.text) && (fontSizeField.text != configuration.configuration.fontSize.toString())
+                                || isDigitsOnly(hideDelayField.text) && (hideDelayField.text != configuration.configuration.hideDelay.toString())
                                 || configuration.configuration.mainKeymap != mainKeymapPanel.getDescription()
                                 || configuration.configuration.alternativeKeymap != getAlternativeKeymap()
 
@@ -157,17 +165,24 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
 
     override fun apply() {
         configuration.setFontSize(fontSizeField.text.trim().toInt())
+        configuration.setHideDelay(hideDelayField.text.trim().toInt())
         configuration.configuration.mainKeymap = mainKeymapPanel.getDescription()
         configuration.configuration.alternativeKeymap = getAlternativeKeymap()
-
     }
+
     override fun reset() {
         fontSizeField.text = configuration.configuration.fontSize.toString()
+        hideDelayField.text = configuration.configuration.hideDelay.toString()
         showAltKeymap.isSelected = configuration.configuration.alternativeKeymap != null
         mainKeymapPanel.reset(configuration.configuration.mainKeymap)
         altKeymapPanel.reset(configuration.configuration.alternativeKeymap ?: KeymapDescription("", ""))
         updatePanels()
     }
+
     override fun disposeUIResources() {
+    }
+
+    private fun isDigitsOnly(string: String): Boolean {
+        return string.all { c -> c.isDigit() }
     }
 }

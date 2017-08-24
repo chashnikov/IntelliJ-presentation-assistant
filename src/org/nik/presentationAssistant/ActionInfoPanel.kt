@@ -40,17 +40,14 @@ import java.util.*
 import javax.swing.*
 import com.intellij.openapi.util.Pair as IdeaPair
 
-val hideDelay = 4*1000
-
-
-
 class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>) : NonOpaquePanel(BorderLayout()), Disposable {
     private val hint: JBPopup
     private val labelsPanel: JPanel
-    private val hideAlarm = Alarm(this);
+    private val hideAlarm = Alarm(this)
     private var animator: Animator
     private var phase = Phase.FADING_IN
     private val hintAlpha = if (UIUtil.isUnderDarcula()) 0.05.toFloat() else 0.1.toFloat()
+    private val pluginConfiguration = getPresentationAssistant().configuration
     enum class Phase { FADING_IN, SHOWN, FADING_OUT, HIDDEN}
     init
     {
@@ -115,7 +112,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         if (hint.isDisposed) return null
         val window = SwingUtilities.windowForComponent(hint.content)
         if (window != null && window.isShowing) return window
-        return null;
+        return null
     }
 
     private fun setAlpha(alpha: Float) {
@@ -129,7 +126,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         phase = Phase.SHOWN
         setAlpha(hintAlpha)
         hideAlarm.cancelAllRequests()
-        hideAlarm.addRequest({fadeOut()}, hideDelay)
+        hideAlarm.addRequest({ fadeOut() }, pluginConfiguration.hideDelay)
     }
 
     fun updateText(project: Project, textFragments: List<Pair<String, Font?>>) {
@@ -160,7 +157,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
     }
 
     private fun List<Pair<String, Font?>>.mergeFragments() : List<Pair<String, Font?>> {
-        var result = ArrayList<Pair<String, Font?>>()
+        val result = ArrayList<Pair<String, Font?>>()
         for (item in this) {
             val last = result.lastOrNull()
             if (last != null && last.second == item.second) {
@@ -175,7 +172,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
     }
 
     private fun createLabels(textFragments: List<Pair<String, Font?>>, ideFrame: IdeFrame): List<JLabel> {
-        var fontSize = getPresentationAssistant().configuration.fontSize.toFloat()
+        var fontSize = pluginConfiguration.fontSize.toFloat()
         val labels = textFragments.mergeFragments().map {
             val label = JLabel("<html>${it.first}</html>", SwingConstants.CENTER)
             if (it.second != null) label.font = it.second
