@@ -1,7 +1,6 @@
 buildscript {
     ext.kotlin_version = kotlinVersion
     repositories {
-        maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
         jcenter()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         mavenCentral()
@@ -13,7 +12,7 @@ buildscript {
 }
 
 plugins {
-    id 'org.jetbrains.intellij' version "0.1.10"
+    id 'org.jetbrains.intellij' version "0.2.16"
 }
 
 allprojects {
@@ -35,7 +34,7 @@ allprojects {
         version ideaVersion
         pluginName 'Presentation Assistant'
         updateSinceUntilBuild false
-        publish {
+        publishPlugin {
             username publishUsername
             password publishPassword
         }
