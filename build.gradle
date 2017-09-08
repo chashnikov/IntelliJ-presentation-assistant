@@ -1,7 +1,6 @@
 buildscript {
     ext.kotlin_version = kotlinVersion
     repositories {
-        maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
         jcenter()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         mavenCentral()
