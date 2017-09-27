@@ -31,7 +31,7 @@ import java.awt.Font
 import java.util.*
 import javax.swing.KeyStroke
 
-class ShortcutPresenter() : Disposable {
+class ShortcutPresenter : Disposable {
     private val movingActions = setOf(
             "EditorLeft", "EditorRight", "EditorDown", "EditorUp",
             "EditorLineStart", "EditorLineEnd", "EditorPageUp", "EditorPageDown",
@@ -102,7 +102,7 @@ class ShortcutPresenter() : Disposable {
                 }
             }
 
-            override fun beforeEditorTyping(c: Char, dataContext: DataContext?) { }
+            override fun beforeEditorTyping(c: Char, dataContext: DataContext?) {}
         }, this)
     }
 
@@ -118,7 +118,7 @@ class ShortcutPresenter() : Disposable {
         val actionText = (if (parentGroupName != null) "$parentGroupName ${MacKeymapUtil.RIGHT} " else "") + (actionData.actionText ?: "").removeSuffix("...")
 
         val fragments = ArrayList<Pair<String, Font?>>()
-        if (actionText.length > 0) {
+        if (actionText.isNotEmpty()) {
             fragments.addText("<b>$actionText</b>")
         }
 
@@ -144,14 +144,13 @@ class ShortcutPresenter() : Disposable {
         if (realProject != null && !realProject.isDisposed && realProject.isOpen) {
             if (infoPanel == null || !infoPanel!!.canBeReused()) {
                 infoPanel = ActionInfoPanel(realProject, fragments)
-            }
-            else {
+            } else {
                 infoPanel!!.updateText(realProject, fragments)
             }
         }
     }
 
-    private fun shortcutTextFragments(keymap: KeymapDescription, actionId: String, shownShortcut: String) : List<Pair<String, Font?>> {
+    private fun shortcutTextFragments(keymap: KeymapDescription, actionId: String, shownShortcut: String): List<Pair<String, Font?>> {
         val fragments = ArrayList<Pair<String, Font?>>()
         val shortcutText = shortcutText(keymap.getKeymap()?.getShortcuts(actionId), keymap.getKind())
         if (shortcutText.isEmpty() || shortcutText == shownShortcut) return fragments
@@ -165,7 +164,7 @@ class ShortcutPresenter() : Disposable {
             }
             else -> {
                 val altShortcutAsWin = shortcutText(keymap.getKeymap()?.getShortcuts(actionId), KeymapKind.WIN)
-                if (altShortcutAsWin.length > 0 && shownShortcut != altShortcutAsWin) {
+                if (altShortcutAsWin.isNotEmpty() && shownShortcut != altShortcutAsWin) {
                     fragments.addText(altShortcutAsWin)
                 }
             }
@@ -179,7 +178,7 @@ class ShortcutPresenter() : Disposable {
 
     private fun shortcutText(shortcuts: Array<Shortcut>?, keymapKind: KeymapKind) =
         when {
-            shortcuts == null || shortcuts.size == 0 -> ""
+            shortcuts == null || shortcuts.isEmpty() -> ""
             else -> shortcutText(shortcuts[0], keymapKind)
         }
 
@@ -198,7 +197,7 @@ class ShortcutPresenter() : Disposable {
                    if (modifiers > 0) getWinModifiersText(modifiers) else null,
                    getWinKeyText(keystroke.keyCode)
                 )
-                tokens.filterNotNull().filter {it.isNotEmpty()}.joinToString(separator = "+").trim()
+                tokens.filterNotNull().filter { it.isNotEmpty() }.joinToString(separator = "+").trim()
             }
     }
 
