@@ -20,6 +20,7 @@
 package org.nik.presentationAssistant
 
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -126,7 +127,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         phase = Phase.SHOWN
         setAlpha(hintAlpha)
         hideAlarm.cancelAllRequests()
-        hideAlarm.addRequest({ fadeOut() }, pluginConfiguration.hideDelay)
+        hideAlarm.addRequest({ fadeOut() }, pluginConfiguration.hideDelay, ModalityState.any())
     }
 
     fun updateText(project: Project, textFragments: List<Pair<String, Font?>>) {
