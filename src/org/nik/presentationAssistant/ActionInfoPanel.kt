@@ -44,7 +44,7 @@ import com.intellij.openapi.util.Pair as IdeaPair
 class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>) : NonOpaquePanel(BorderLayout()), Disposable {
     private val hint: JBPopup
     private val labelsPanel: JPanel
-    private val hideAlarm = Alarm(this);
+    private val hideAlarm = Alarm(this)
     private var animator: Animator
     private var phase = Phase.FADING_IN
     private val hintAlpha = if (UIUtil.isUnderDarcula()) 0.05.toFloat() else 0.1.toFloat()
@@ -92,7 +92,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         animator.resume()
     }
 
-    inner class FadeInOutAnimator(val forward: Boolean): Animator("Action Hint Fade In/Out", 5, 100, false, forward) {
+    inner class FadeInOutAnimator(private val forward: Boolean): Animator("Action Hint Fade In/Out", 5, 100, false, forward) {
         override fun paintNow(frame: Int, totalFrames: Int, cycle: Int) {
             if (forward && phase != Phase.FADING_IN
                 || !forward && phase != Phase.FADING_OUT) return
@@ -113,7 +113,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         if (hint.isDisposed) return null
         val window = SwingUtilities.windowForComponent(hint.content)
         if (window != null && window.isShowing) return window
-        return null;
+        return null
     }
 
     private fun setAlpha(alpha: Float) {
@@ -158,7 +158,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
     }
 
     private fun List<Pair<String, Font?>>.mergeFragments() : List<Pair<String, Font?>> {
-        var result = ArrayList<Pair<String, Font?>>()
+        val result = ArrayList<Pair<String, Font?>>()
         for (item in this) {
             val last = result.lastOrNull()
             if (last != null && last.second == item.second) {

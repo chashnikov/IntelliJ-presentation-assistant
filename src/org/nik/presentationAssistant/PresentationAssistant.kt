@@ -52,7 +52,7 @@ class PresentationAssistantState {
 @State(name = "PresentationAssistant", storages = arrayOf(Storage(file = "presentation-assistant.xml")))
 class PresentationAssistant : ApplicationComponent, PersistentStateComponent<PresentationAssistantState> {
     val configuration = PresentationAssistantState()
-    var presenter: ShortcutPresenter? = null
+    private var presenter: ShortcutPresenter? = null
 
     override fun getState() = configuration
     override fun loadState(p: PresentationAssistantState) {
@@ -93,12 +93,11 @@ class PresentationAssistant : ApplicationComponent, PersistentStateComponent<Pre
 fun getPresentationAssistant(): PresentationAssistant = ApplicationManager.getApplication().getComponent(PresentationAssistant::class.java)
 
 class KeymapDescriptionPanel {
-    val combobox : ComboBox<Keymap>
-    val text = JTextField(10)
+    private val combobox = ComboBox(KeymapManagerEx.getInstanceEx().allKeymaps)
+    private val text = JTextField(10)
     val mainPanel: JPanel
     init
     {
-        combobox = ComboBox(KeymapManagerEx.getInstanceEx().allKeymaps)
         combobox.renderer = object: ListCellRendererWrapper<Keymap>() {
             override fun customize(list: JList<*>, t: Keymap?, index: Int, selected: Boolean, hasFocus: Boolean) {
                 setText(t?.presentableName ?: "")
@@ -124,13 +123,13 @@ class KeymapDescriptionPanel {
 }
 
 class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
-    val configuration: PresentationAssistant = getPresentationAssistant()
-    val showAltKeymap = JCheckBox("Alternative Keymap:")
-    val mainKeymapPanel = KeymapDescriptionPanel()
-    val altKeymapPanel = KeymapDescriptionPanel()
-    val fontSizeField = JTextField(5)
-    val hideDelayField = JTextField(5)
-    val mainPanel: JPanel
+    private val configuration: PresentationAssistant = getPresentationAssistant()
+    private val showAltKeymap = JCheckBox("Alternative Keymap:")
+    private val mainKeymapPanel = KeymapDescriptionPanel()
+    private val altKeymapPanel = KeymapDescriptionPanel()
+    private val fontSizeField = JTextField(5)
+    private val hideDelayField = JTextField(5)
+    private val mainPanel: JPanel
     init
     {
         val formBuilder = FormBuilder.createFormBuilder()
@@ -161,7 +160,7 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
                                 || configuration.configuration.mainKeymap != mainKeymapPanel.getDescription()
                                 || configuration.configuration.alternativeKeymap != getAlternativeKeymap()
 
-    fun getAlternativeKeymap() = if (showAltKeymap.isSelected) altKeymapPanel.getDescription() else null
+    private fun getAlternativeKeymap() = if (showAltKeymap.isSelected) altKeymapPanel.getDescription() else null
 
     override fun apply() {
         configuration.setFontSize(fontSizeField.text.trim().toInt())

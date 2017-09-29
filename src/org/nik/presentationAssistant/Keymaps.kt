@@ -23,9 +23,6 @@ import com.intellij.openapi.keymap.KeymapManager
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.util.PlatformUtils
 
-private val winKeymap = KeymapManager.getInstance().getKeymap(KeymapKind.WIN.defaultKeymapName)
-private val macKeymap = KeymapManager.getInstance().getKeymap(KeymapKind.MAC.defaultKeymapName);
-
 enum class KeymapKind(val displayName: String, val defaultKeymapName: String) {
     WIN("Win/Linux", "\$default"),
     MAC("Mac", "Mac OS X 10.5+");
@@ -39,11 +36,6 @@ enum class KeymapKind(val displayName: String, val defaultKeymapName: String) {
 fun getCurrentOSKind() = when {
     SystemInfo.isMac -> KeymapKind.MAC
     else -> KeymapKind.WIN
-}
-
-fun KeymapKind.getKeymap() = when (this) {
-    KeymapKind.WIN -> winKeymap
-    KeymapKind.MAC -> macKeymap
 }
 
 class KeymapDescription(var name: String = "", var displayText: String = "") {

@@ -47,7 +47,7 @@ class ShortcutPresenter : Disposable {
             IdeActions.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE)
     private val parentGroupIds = setOf("CodeCompletionGroup", "FoldingGroup", "GoToMenu", "IntroduceActionsGroup")
     private var infoPanel: ActionInfoPanel? = null
-    private val parentNames = HashMap<String, String>();
+    private val parentNames = HashMap<String, String>()
     init
     {
         enable()
@@ -134,9 +134,9 @@ class ShortcutPresenter : Disposable {
             val mainShortcut = shortcutText(mainKeymap.getKeymap()?.getShortcuts(actionId), mainKeymap.getKind())
             val altShortcutTextFragments = shortcutTextFragments(alternativeKeymap, actionId, mainShortcut)
             if (altShortcutTextFragments.isNotEmpty()) {
-                fragments.addText("&nbsp;(");
+                fragments.addText("&nbsp;(")
                 fragments.addAll(altShortcutTextFragments)
-                fragments.addText(")");
+                fragments.addText(")")
             }
         }
 
@@ -184,7 +184,7 @@ class ShortcutPresenter : Disposable {
 
     private fun shortcutText(shortcut: Shortcut, keymapKind: KeymapKind) =
         when (shortcut) {
-            is KeyboardShortcut -> arrayOf(shortcut.firstKeyStroke, shortcut.secondKeyStroke).filterNotNull().map { shortcutText(it, keymapKind) }.joinToString(separator = ", ")
+            is KeyboardShortcut -> arrayOf(shortcut.firstKeyStroke, shortcut.secondKeyStroke).filterNotNull().joinToString(separator = ", ") { shortcutText(it, keymapKind) }
             else -> ""
         }
 

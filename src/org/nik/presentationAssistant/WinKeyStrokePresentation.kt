@@ -36,9 +36,7 @@ val inputEventMaskFieldNames by lazy {
 
 fun getWinModifiersText(modifiers: Int) =
         inputEventMaskFieldNames
-                .filter { modifiers and (it.second) != 0}
-                .map { it.first }
-                .joinToString("+")
+                .filter { modifiers and (it.second) != 0}.joinToString("+") { it.first }
 
 val keyEventFieldNames by lazy {
     KeyEvent::class.java.fields
@@ -61,4 +59,4 @@ fun getWinKeyText(key: Int) =
         else -> "Unknown key 0x${Integer.toHexString(key)}"
     }
 
-fun fieldNameToPresentableName(name: String) = name.split('_').map { StringUtil.capitalize(it.toLowerCase()) }.joinToString(" ")
+fun fieldNameToPresentableName(name: String) = name.split('_').joinToString(" ") { StringUtil.capitalize(it.toLowerCase()) }
