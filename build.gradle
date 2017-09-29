@@ -35,7 +35,7 @@ allprojects {
         version ideaVersion
         pluginName 'Presentation Assistant'
         updateSinceUntilBuild false
-        publish {
+        publishPlugin {
             username publishUsername
             password publishPassword
         }
