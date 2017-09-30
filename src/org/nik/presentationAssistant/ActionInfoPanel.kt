@@ -146,8 +146,16 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         val statusBarHeight = ideFrame.statusBar.component.height
         val visibleRect = ideFrame.component.visibleRect
         val popupSize = preferredSize
-        val point = Point(visibleRect.x + (visibleRect.width - popupSize.width) / 2, visibleRect.y + visibleRect.height - popupSize.height - statusBarHeight - 5)
-        return RelativePoint(ideFrame.component, point)
+        val x = when (pluginConfiguration.horizontalAlignment) {
+            PopupHorizontalAlignment.LEFT -> visibleRect.x + 10
+            PopupHorizontalAlignment.CENTER -> visibleRect.x + (visibleRect.width - popupSize.width) / 2
+            PopupHorizontalAlignment.RIGHT -> visibleRect.x + visibleRect.width - popupSize.width - 10
+        }
+        val y = when (pluginConfiguration.verticalAlignment) {
+            PopupVerticalAlignment.TOP -> visibleRect.y + 10
+            PopupVerticalAlignment.BOTTOM -> visibleRect.y + visibleRect.height - popupSize.height - statusBarHeight - 5
+        }
+        return RelativePoint(ideFrame.component, Point(x, y))
     }
 
     private fun updateLabelText(project: Project, textFragments: List<Pair<String, Font?>>) {

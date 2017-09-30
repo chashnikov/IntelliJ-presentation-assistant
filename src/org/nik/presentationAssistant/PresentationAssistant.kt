@@ -36,10 +36,8 @@ import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.xmlb.XmlSerializerUtil
 import java.awt.BorderLayout
-import javax.swing.JCheckBox
-import javax.swing.JList
-import javax.swing.JPanel
-import javax.swing.JTextField
+import java.awt.FlowLayout
+import javax.swing.*
 
 class PresentationAssistantState {
     var showActionDescriptions = true
@@ -47,7 +45,12 @@ class PresentationAssistantState {
     var hideDelay = 4*1000
     var mainKeymap = getDefaultMainKeymap()
     var alternativeKeymap = getDefaultAlternativeKeymap()
+    var horizontalAlignment = PopupHorizontalAlignment.CENTER
+    var verticalAlignment = PopupVerticalAlignment.BOTTOM
 }
+
+enum class PopupHorizontalAlignment { LEFT, CENTER, RIGHT }
+enum class PopupVerticalAlignment { TOP, BOTTOM }
 
 @State(name = "PresentationAssistant", storages = arrayOf(Storage(file = "presentation-assistant.xml")))
 class PresentationAssistant : ApplicationComponent, PersistentStateComponent<PresentationAssistantState> {
@@ -129,12 +132,29 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
     private val altKeymapPanel = KeymapDescriptionPanel()
     private val fontSizeField = JTextField(5)
     private val hideDelayField = JTextField(5)
+    private val horizontalAlignmentButtons = PopupHorizontalAlignment.values().associate { it to JRadioButton(it.name.toLowerCase().capitalize()) }
+    private val verticalAlignmentButtons = PopupVerticalAlignment.values().associate { it to JRadioButton(it.name.toLowerCase().capitalize()) }
     private val mainPanel: JPanel
     init
     {
+        val horizontalAlignmentPanel = JPanel(FlowLayout(FlowLayout.LEFT)).apply {
+            horizontalAlignmentButtons.values.forEach { add(it) }
+        }
+        val verticalAlignmentPanel = JPanel(FlowLayout(FlowLayout.LEFT)).apply {
+            verticalAlignmentButtons.values.forEach { add(it) }
+        }
+        ButtonGroup().apply {
+            horizontalAlignmentButtons.values.forEach { add(it) }
+        }
+        ButtonGroup().apply {
+            verticalAlignmentButtons.values.forEach { add(it) }
+        }
+
         val formBuilder = FormBuilder.createFormBuilder()
                            .addLabeledComponent("&Font size:", fontSizeField)
                            .addLabeledComponent("&Display duration (in ms):", hideDelayField)
+                           .addLabeledComponent("Horizontal alignment:", horizontalAlignmentPanel, 0)
+                           .addLabeledComponent("Vertical alignment:", verticalAlignmentPanel, 0)
                            .addVerticalGap(10)
                            .addLabeledComponent("Main Keymap:", mainKeymapPanel.mainPanel, true)
                            .addLabeledComponent(showAltKeymap, altKeymapPanel.mainPanel, true)
@@ -159,6 +179,8 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
                                 || isDigitsOnly(hideDelayField.text) && (hideDelayField.text != configuration.configuration.hideDelay.toString())
                                 || configuration.configuration.mainKeymap != mainKeymapPanel.getDescription()
                                 || configuration.configuration.alternativeKeymap != getAlternativeKeymap()
+                                || !horizontalAlignmentButtons[configuration.configuration.horizontalAlignment]!!.isSelected
+                                || !verticalAlignmentButtons[configuration.configuration.verticalAlignment]!!.isSelected
 
     private fun getAlternativeKeymap() = if (showAltKeymap.isSelected) altKeymapPanel.getDescription() else null
 
@@ -167,6 +189,8 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
         configuration.setHideDelay(hideDelayField.text.trim().toInt())
         configuration.configuration.mainKeymap = mainKeymapPanel.getDescription()
         configuration.configuration.alternativeKeymap = getAlternativeKeymap()
+        configuration.configuration.horizontalAlignment = horizontalAlignmentButtons.entries.find { it.value.isSelected }!!.key
+        configuration.configuration.verticalAlignment = verticalAlignmentButtons.entries.find { it.value.isSelected }!!.key
     }
 
     override fun reset() {
@@ -175,6 +199,8 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
         showAltKeymap.isSelected = configuration.configuration.alternativeKeymap != null
         mainKeymapPanel.reset(configuration.configuration.mainKeymap)
         altKeymapPanel.reset(configuration.configuration.alternativeKeymap ?: KeymapDescription("", ""))
+        horizontalAlignmentButtons.forEach { value, button -> button.isSelected = configuration.configuration.horizontalAlignment == value }
+        verticalAlignmentButtons.forEach { value, button -> button.isSelected = configuration.configuration.verticalAlignment == value }
         updatePanels()
     }
 
