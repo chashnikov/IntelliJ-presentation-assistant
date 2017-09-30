@@ -14,16 +14,19 @@
   ~ limitations under the License.
   -->
 
-<idea-plugin version="2">
+<idea-plugin>
   <id>org.nik.presentation-assistant</id>
   <name>Presentation Assistant</name>
   <vendor>Nikolay Chashnikov</vendor>
-  <idea-version since-build="145.1"/>
+  <idea-version since-build="172.1"/>
 
   <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (View | Descriptions of Actions) ]]></description>
   <change-notes><![CDATA[
     <ul>
-    <li>Fixed compatibility with 171.* builds.</li>
+    <li>Time during which hint is shown can be changed (Settings | Appearance & Behavior | Presentation Assistant).</li>
+    <li>Position of hints can be changed (Settings | Appearance & Behavior | Presentation Assistant).</li>
+    <li>Colors of hints can be changed (Settings | Editor | Color Scheme | Presentation Assistant).</li>
+    <li>Fixed bug which caused hint to be never hidden if a dialog is opened.</li>
     </ul>
 ]]></change-notes>
 
