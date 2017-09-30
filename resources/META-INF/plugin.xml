@@ -36,6 +36,7 @@
   </application-components>
   <extensions defaultExtensionNs="com.intellij">
       <applicationConfigurable groupId="appearance" groupWeight="-15" instance="org.nik.presentationAssistant.PresentationAssistantConfigurable"/>
+      <colorSettingsPage implementation="org.nik.presentationAssistant.ActionInfoColorSettings"/>
   </extensions>
   <actions>
     <action class="org.nik.presentationAssistant.ShowActionDescriptionsToggleAction"

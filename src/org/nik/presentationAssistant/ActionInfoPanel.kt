@@ -21,6 +21,7 @@ package org.nik.presentationAssistant
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -29,7 +30,6 @@ import com.intellij.openapi.ui.popup.LightweightWindowEvent
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.IdeFrame
 import com.intellij.openapi.wm.WindowManager
-import com.intellij.ui.JBColor
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.panels.NonOpaquePanel
 import com.intellij.ui.popup.ComponentPopupBuilderImpl
@@ -39,6 +39,7 @@ import com.intellij.util.ui.UIUtil
 import java.awt.*
 import java.util.*
 import javax.swing.*
+import kotlin.Pair
 import com.intellij.openapi.util.Pair as IdeaPair
 
 class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>) : NonOpaquePanel(BorderLayout()), Disposable {
@@ -54,9 +55,8 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
     {
         val ideFrame = WindowManager.getInstance().getIdeFrame(project)
         labelsPanel = NonOpaquePanel(FlowLayout(FlowLayout.CENTER, 0, 0))
-        val background = JBColor(Color(186, 238, 186, 120), Color(73, 117, 73))
         updateLabelText(project, textFragments)
-        setBackground(background)
+        background = EditorColorsManager.getInstance().globalScheme.getColor(BACKGROUND_COLOR_KEY)
         isOpaque = true
         add(labelsPanel, BorderLayout.CENTER)
         val emptyBorder = BorderFactory.createEmptyBorder(5, 10, 5, 10)
@@ -182,8 +182,10 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
 
     private fun createLabels(textFragments: List<Pair<String, Font?>>, ideFrame: IdeFrame): List<JLabel> {
         var fontSize = pluginConfiguration.fontSize.toFloat()
+        val color = EditorColorsManager.getInstance().globalScheme.getColor(FOREGROUND_COLOR_KEY)
         val labels = textFragments.mergeFragments().map {
             val label = JLabel("<html>${it.first}</html>", SwingConstants.CENTER)
+            label.foreground = color
             if (it.second != null) label.font = it.second
             label
         }
