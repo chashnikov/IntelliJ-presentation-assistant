@@ -1,48 +1,30 @@
-buildscript {
-    ext.kotlin_version = kotlinVersion
-    repositories {
-        maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
-        jcenter()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
 plugins {
-    id 'org.jetbrains.intellij' version "0.2.17"
+    id 'org.jetbrains.intellij' version '0.2.19'
+    id 'org.jetbrains.kotlin.jvm' version '1.2.30'
+    id 'idea'
 }
 
-allprojects {
-    apply plugin: 'java'
-    apply plugin: 'kotlin'
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
 
-    sourceSets {
-        main {
-            java.srcDirs 'src'
-            kotlin.srcDirs 'src'
-            resources.srcDir 'resources'
-        }
-    }
-
-    apply plugin: 'org.jetbrains.intellij'
-    intellij {
-        version ideaVersion
-        pluginName 'Presentation Assistant'
-        updateSinceUntilBuild false
-        publishPlugin {
-            username publishUsername
-            password publishPassword
-        }
+sourceSets {
+    main {
+        java.srcDirs 'src'
+        kotlin.srcDirs 'src'
+        resources.srcDir 'resources'
     }
 }
 
-apply plugin: 'idea'
+intellij {
+    version = ideaVersion
+    pluginName = 'Presentation Assistant'
+    updateSinceUntilBuild = false
+    publishPlugin {
+        username publishUsername
+        password publishPassword
+    }
+}
+
 idea {
     project {
         jdkName = javaVersion
