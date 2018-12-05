@@ -183,7 +183,7 @@ class ShortcutPresenter : Disposable {
 
     private fun shortcutText(keystroke: KeyStroke, keymapKind: KeymapKind) =
         when (keymapKind) {
-            KeymapKind.MAC -> MacKeymapUtil.getKeyStrokeText(keystroke) ?: ""
+            KeymapKind.MAC -> MacKeymapUtil.getKeyStrokeText(keystroke)
             KeymapKind.WIN -> {
                 val modifiers = keystroke.modifiers
                 val tokens = arrayOf(
