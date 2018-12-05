@@ -47,40 +47,14 @@ class ShortcutPresenter : Disposable {
             IdeActions.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE)
     private val parentGroupIds = setOf("CodeCompletionGroup", "FoldingGroup", "GoToMenu", "IntroduceActionsGroup")
     private var infoPanel: ActionInfoPanel? = null
-    private val parentNames = HashMap<String, String>()
+    private val parentNames by lazy(::loadParentNames)
     init
     {
         enable()
     }
 
-    private fun fillParentNames(group: ActionGroup, parentName: String) {
-        val actionManager = ActionManager.getInstance()
-        for (item in group.getChildren(null)) {
-            when (item) {
-                is ActionGroup -> {
-                    if (!item.isPopup) fillParentNames(item, parentName)
-                }
-                else -> {
-                    val id = actionManager.getId(item)
-                    if (id != null) {
-                        parentNames[id] = parentName
-                    }
-                }
-            }
-        }
-
-    }
-
     private fun enable() {
-        val actionManager = ActionManager.getInstance()
-        for (groupId in parentGroupIds) {
-            val group = actionManager.getAction(groupId)
-            if (group is ActionGroup) {
-                fillParentNames(group, group.getTemplatePresentation().text!!)
-            }
-        }
-
-        actionManager.addAnActionListener(object: AnActionListener {
+        ActionManager.getInstance().addAnActionListener(object: AnActionListener {
             override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent?) {
                 val actionId = ActionManager.getInstance().getId(action) ?: return
 
@@ -93,6 +67,36 @@ class ShortcutPresenter : Disposable {
 
             override fun beforeEditorTyping(c: Char, dataContext: DataContext?) {}
         }, this)
+    }
+
+    private fun loadParentNames(): Map<String, String> {
+        val result = LinkedHashMap<String, String>()
+        val actionManager = ActionManager.getInstance()
+        for (groupId in parentGroupIds) {
+            val group = actionManager.getAction(groupId)
+            if (group is ActionGroup) {
+                fillParentNames(group, group.getTemplatePresentation().text!!, result)
+            }
+        }
+        return result
+    }
+
+    private fun fillParentNames(group: ActionGroup, parentName: String, parentNames: MutableMap<String, String>) {
+        val actionManager = ActionManager.getInstance()
+        for (item in group.getChildren(null)) {
+            when (item) {
+                is ActionGroup -> {
+                    if (!item.isPopup) fillParentNames(item, parentName, parentNames)
+                }
+                else -> {
+                    val id = actionManager.getId(item)
+                    if (id != null) {
+                        parentNames[id] = parentName
+                    }
+                }
+            }
+        }
+
     }
 
     class ActionData(val actionId: String, val project: Project?, val actionText: String?)
