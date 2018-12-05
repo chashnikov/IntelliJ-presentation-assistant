@@ -22,6 +22,11 @@
 
   <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (View | Descriptions of Actions) ]]></description>
   <change-notes><![CDATA[
+    <p>1.0.2</p>
+    <ul>
+    <li>Fix problem with changing menu item in CLion.</li>
+    </ul>
+    <p>1.0.1</p>
     <ul>
     <li>Time during which hint is shown can be changed (Settings | Appearance & Behavior | Presentation Assistant).</li>
     <li>Position of hints can be changed (Settings | Appearance & Behavior | Presentation Assistant).</li>
