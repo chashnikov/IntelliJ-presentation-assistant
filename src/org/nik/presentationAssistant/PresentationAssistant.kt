@@ -31,7 +31,7 @@ import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
-import com.intellij.ui.ListCellRendererWrapper
+import com.intellij.ui.SimpleListCellRenderer
 import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.xmlb.XmlSerializerUtil
@@ -101,9 +101,9 @@ class KeymapDescriptionPanel {
     val mainPanel: JPanel
     init
     {
-        combobox.renderer = object: ListCellRendererWrapper<Keymap>() {
-            override fun customize(list: JList<*>, t: Keymap?, index: Int, selected: Boolean, hasFocus: Boolean) {
-                setText(t?.presentableName ?: "")
+        combobox.renderer = object: SimpleListCellRenderer<Keymap>() {
+            override fun customize(list: JList<out Keymap>, value: Keymap?, index: Int, selected: Boolean, hasFocus: Boolean) {
+                text = value?.presentableName ?: ""
             }
         }
         val formBuilder = FormBuilder.createFormBuilder()
