@@ -18,7 +18,7 @@
   <id>org.nik.presentation-assistant</id>
   <name>Presentation Assistant</name>
   <vendor>Nikolay Chashnikov</vendor>
-  <idea-version since-build="193.1"/>
+  <idea-version since-build="193.5233"/>
 
   <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (View | Descriptions of Actions) ]]></description>
   <change-notes><![CDATA[
@@ -43,6 +43,7 @@
 
   <applicationListeners>
     <listener class="org.nik.presentationAssistant.PresentationAssistantListenerRegistrar" topic="com.intellij.ide.AppLifecycleListener"/>
+    <listener class="org.nik.presentationAssistant.PresentationAssistantListenerRegistrar" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
   </applicationListeners>
   <extensions defaultExtensionNs="com.intellij">
       <applicationService serviceImplementation="org.nik.presentationAssistant.PresentationAssistant"/>

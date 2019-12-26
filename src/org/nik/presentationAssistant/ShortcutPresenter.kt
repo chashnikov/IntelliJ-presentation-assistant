@@ -22,6 +22,7 @@ package org.nik.presentationAssistant
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.actionSystem.ex.AnActionListener
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.keymap.MacKeymapUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
@@ -54,7 +55,7 @@ class ShortcutPresenter : Disposable {
     }
 
     private fun enable() {
-        ActionManager.getInstance().addAnActionListener(object: AnActionListener {
+        ApplicationManager.getApplication().messageBus.connect(this).subscribe(AnActionListener.TOPIC, object: AnActionListener {
             override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
                 val actionId = ActionManager.getInstance().getId(action) ?: return
 
@@ -66,7 +67,7 @@ class ShortcutPresenter : Disposable {
             }
 
             override fun beforeEditorTyping(c: Char, dataContext: DataContext) {}
-        }, this)
+        })
     }
 
     private fun loadParentNames(): Map<String, String> {

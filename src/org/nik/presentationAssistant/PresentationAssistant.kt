@@ -20,6 +20,8 @@
 package org.nik.presentationAssistant
 
 import com.intellij.ide.AppLifecycleListener
+import com.intellij.ide.plugins.DynamicPluginListener
+import com.intellij.ide.plugins.IdeaPluginDescriptor
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.ServiceManager
@@ -97,9 +99,15 @@ class PresentationAssistant : PersistentStateComponent<PresentationAssistantStat
 
 fun getPresentationAssistant(): PresentationAssistant = ServiceManager.getService(PresentationAssistant::class.java)
 
-class PresentationAssistantListenerRegistrar : AppLifecycleListener {
+class PresentationAssistantListenerRegistrar : AppLifecycleListener, DynamicPluginListener {
     override fun appFrameCreated(commandLineArgs: MutableList<String>) {
         getPresentationAssistant().initialize()
+    }
+
+    override fun pluginLoaded(pluginDescriptor: IdeaPluginDescriptor) {
+        if (pluginDescriptor.pluginId.idString == "org.nik.presentation-assistant") {
+            getPresentationAssistant().initialize()
+        }
     }
 }
 
