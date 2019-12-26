@@ -19,9 +19,10 @@
  */
 package org.nik.presentationAssistant
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.ApplicationComponent
+import com.intellij.ide.AppLifecycleListener
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.PersistentStateComponent
+import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.keymap.Keymap
@@ -53,7 +54,7 @@ enum class PopupHorizontalAlignment { LEFT, CENTER, RIGHT }
 enum class PopupVerticalAlignment { TOP, BOTTOM }
 
 @State(name = "PresentationAssistant", storages = arrayOf(Storage(file = "presentation-assistant.xml")))
-class PresentationAssistant : ApplicationComponent, PersistentStateComponent<PresentationAssistantState> {
+class PresentationAssistant : PersistentStateComponent<PresentationAssistantState>, Disposable {
     val configuration = PresentationAssistantState()
     private var presenter: ShortcutPresenter? = null
 
@@ -61,15 +62,16 @@ class PresentationAssistant : ApplicationComponent, PersistentStateComponent<Pre
     override fun loadState(p: PresentationAssistantState) {
         XmlSerializerUtil.copyBean(p, configuration)
     }
-    override fun initComponent() {
-        if (configuration.showActionDescriptions) {
+
+    fun initialize() {
+        if (configuration.showActionDescriptions && presenter == null) {
             presenter = ShortcutPresenter()
         }
     }
-    override fun disposeComponent() {
+
+    override fun dispose() {
         presenter?.disable()
     }
-    override fun getComponentName() = "PresentationAssistant"
 
     fun setShowActionsDescriptions(value: Boolean, project: Project?) {
         configuration.showActionDescriptions = value
@@ -93,7 +95,13 @@ class PresentationAssistant : ApplicationComponent, PersistentStateComponent<Pre
     }
 }
 
-fun getPresentationAssistant(): PresentationAssistant = ApplicationManager.getApplication().getComponent(PresentationAssistant::class.java)
+fun getPresentationAssistant(): PresentationAssistant = ServiceManager.getService(PresentationAssistant::class.java)
+
+class PresentationAssistantListenerRegistrar : AppLifecycleListener {
+    override fun appFrameCreated(commandLineArgs: MutableList<String>) {
+        getPresentationAssistant().initialize()
+    }
+}
 
 class KeymapDescriptionPanel {
     private val combobox = ComboBox(KeymapManagerEx.getInstanceEx().allKeymaps)

@@ -22,6 +22,10 @@
 
   <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (View | Descriptions of Actions) ]]></description>
   <change-notes><![CDATA[
+    <p>1.0.3</p>
+    <ul>
+    <li>Prepare plugin for installing without restart in 2020.1.</li>
+    </ul>
     <p>1.0.2</p>
     <ul>
     <li>Fix problem with changing menu item in CLion.</li>
@@ -37,12 +41,11 @@
 
   <depends>com.intellij.modules.lang</depends>
 
-  <application-components>
-      <component>
-          <implementation-class>org.nik.presentationAssistant.PresentationAssistant</implementation-class>
-      </component>
-  </application-components>
+  <applicationListeners>
+    <listener class="org.nik.presentationAssistant.PresentationAssistantListenerRegistrar" topic="com.intellij.ide.AppLifecycleListener"/>
+  </applicationListeners>
   <extensions defaultExtensionNs="com.intellij">
+      <applicationService serviceImplementation="org.nik.presentationAssistant.PresentationAssistant"/>
       <applicationConfigurable groupId="appearance" groupWeight="-15" instance="org.nik.presentationAssistant.PresentationAssistantConfigurable"/>
       <colorSettingsPage implementation="org.nik.presentationAssistant.ActionInfoColorSettings"/>
   </extensions>
