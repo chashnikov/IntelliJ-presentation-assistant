@@ -55,17 +55,17 @@ class ShortcutPresenter : Disposable {
 
     private fun enable() {
         ActionManager.getInstance().addAnActionListener(object: AnActionListener {
-            override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent?) {
+            override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
                 val actionId = ActionManager.getInstance().getId(action) ?: return
 
-                if (!movingActions.contains(actionId) && !typingActions.contains(actionId) && event != null) {
+                if (!movingActions.contains(actionId) && !typingActions.contains(actionId)) {
                     val project = event.project
                     val text = event.presentation.text
                     showActionInfo(ActionData(actionId, project, text))
                 }
             }
 
-            override fun beforeEditorTyping(c: Char, dataContext: DataContext?) {}
+            override fun beforeEditorTyping(c: Char, dataContext: DataContext) {}
         }, this)
     }
 

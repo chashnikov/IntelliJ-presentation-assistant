@@ -39,8 +39,6 @@ import com.intellij.util.ui.UIUtil
 import java.awt.*
 import java.util.*
 import javax.swing.*
-import kotlin.Pair
-import com.intellij.openapi.util.Pair as IdeaPair
 
 class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>) : NonOpaquePanel(BorderLayout()), Disposable {
     private val hint: JBPopup
@@ -53,7 +51,6 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
     enum class Phase { FADING_IN, SHOWN, FADING_OUT, HIDDEN}
     init
     {
-        val ideFrame = WindowManager.getInstance().getIdeFrame(project)
         labelsPanel = NonOpaquePanel(FlowLayout(FlowLayout.CENTER, 0, 0))
         updateLabelText(project, textFragments)
         background = EditorColorsManager.getInstance().globalScheme.getColor(BACKGROUND_COLOR_KEY)
@@ -72,14 +69,14 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
             createPopup()
         }
         hint.addListener(object : JBPopupListener {
-            override fun beforeShown(lightweightWindowEvent: LightweightWindowEvent?) {}
-            override fun onClosed(lightweightWindowEvent: LightweightWindowEvent?) {
+            override fun beforeShown(lightweightWindowEvent: LightweightWindowEvent) {}
+            override fun onClosed(lightweightWindowEvent: LightweightWindowEvent) {
                 phase = Phase.HIDDEN
             }
         })
 
         animator = FadeInOutAnimator(true)
-        hint.show(computeLocation(ideFrame))
+        hint.show(computeLocation(project))
         animator.resume()
     }
 
@@ -135,15 +132,15 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         labelsPanel.removeAll()
         updateLabelText(project, textFragments)
         hint.content.invalidate()
-        val ideFrame = WindowManager.getInstance().getIdeFrame(project)
-        hint.setLocation(computeLocation(ideFrame).screenPoint)
+        hint.setLocation(computeLocation(project).screenPoint)
         hint.size = preferredSize
         hint.content.repaint()
         showFinal()
     }
 
-    private fun computeLocation(ideFrame: IdeFrame): RelativePoint {
-        val statusBarHeight = ideFrame.statusBar.component.height
+    private fun computeLocation(project: Project): RelativePoint {
+        val ideFrame = WindowManager.getInstance().getIdeFrame(project)!!
+        val statusBarHeight = ideFrame.statusBar?.component?.height ?: 0
         val visibleRect = ideFrame.component.visibleRect
         val popupSize = preferredSize
         val x = when (pluginConfiguration.horizontalAlignment) {
@@ -159,7 +156,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
     }
 
     private fun updateLabelText(project: Project, textFragments: List<Pair<String, Font?>>) {
-        val ideFrame = WindowManager.getInstance().getIdeFrame(project)
+        val ideFrame = WindowManager.getInstance().getIdeFrame(project)!!
         for (label in createLabels(textFragments, ideFrame)) {
             labelsPanel.add(label)
         }

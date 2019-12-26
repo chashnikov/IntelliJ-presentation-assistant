@@ -18,7 +18,7 @@
   <id>org.nik.presentation-assistant</id>
   <name>Presentation Assistant</name>
   <vendor>Nikolay Chashnikov</vendor>
-  <idea-version since-build="182.1"/>
+  <idea-version since-build="193.1"/>
 
   <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (View | Descriptions of Actions) ]]></description>
   <change-notes><![CDATA[
