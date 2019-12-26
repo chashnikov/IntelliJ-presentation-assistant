@@ -3,3 +3,6 @@
 /.idea/modules/
 /.idea/inspectionProfiles/
 /.idea/scopes/
+/build/
+/.gradle/
+/out/
