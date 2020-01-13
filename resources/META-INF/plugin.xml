@@ -20,7 +20,7 @@
   <vendor>Nikolay Chashnikov</vendor>
   <idea-version since-build="193.5233"/>
 
-  <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (View | Descriptions of Actions) ]]></description>
+  <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (View | Appearance | Descriptions of Actions) ]]></description>
   <change-notes><![CDATA[
     <p>1.0.3</p>
     <ul>
