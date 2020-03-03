@@ -29,6 +29,7 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.SystemInfo
 import java.awt.Font
+import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
@@ -188,7 +189,7 @@ class ShortcutPresenter : Disposable {
             KeymapKind.WIN -> {
                 val modifiers = keystroke.modifiers
                 val tokens = arrayOf(
-                   if (modifiers > 0) getWinModifiersText(modifiers) else null,
+                   if (modifiers > 0) KeyEvent.getKeyModifiersText(modifiers) else null,
                    getWinKeyText(keystroke.keyCode)
                 )
                 tokens.filterNotNull().filter { it.isNotEmpty() }.joinToString(separator = "+").trim()
