@@ -22,6 +22,11 @@
 
   <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (View | Appearance | Descriptions of Actions) ]]></description>
   <change-notes><![CDATA[
+    <p>1.0.4</p>
+    <ul>
+    <li>Correct location of the plugin action in the description.</li>
+    <li>Show modifiers for Win/Linux shortcuts in consistent order.</li>
+    </ul>
     <p>1.0.3</p>
     <ul>
     <li>Prepare plugin for installing without restart in 2020.1.</li>
