@@ -144,13 +144,13 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         val visibleRect = ideFrame.component.visibleRect
         val popupSize = preferredSize
         val x = when (pluginConfiguration.horizontalAlignment) {
-            PopupHorizontalAlignment.LEFT -> visibleRect.x + 10
+            PopupHorizontalAlignment.LEFT -> visibleRect.x + pluginConfiguration.margin
             PopupHorizontalAlignment.CENTER -> visibleRect.x + (visibleRect.width - popupSize.width) / 2
-            PopupHorizontalAlignment.RIGHT -> visibleRect.x + visibleRect.width - popupSize.width - 10
+            PopupHorizontalAlignment.RIGHT -> visibleRect.x + visibleRect.width - popupSize.width - pluginConfiguration.margin
         }
         val y = when (pluginConfiguration.verticalAlignment) {
-            PopupVerticalAlignment.TOP -> visibleRect.y + 10
-            PopupVerticalAlignment.BOTTOM -> visibleRect.y + visibleRect.height - popupSize.height - statusBarHeight - 5
+            PopupVerticalAlignment.TOP -> visibleRect.y + pluginConfiguration.margin
+            PopupVerticalAlignment.BOTTOM -> visibleRect.y + visibleRect.height - popupSize.height - statusBarHeight - pluginConfiguration.margin
         }
         return RelativePoint(ideFrame.component, Point(x, y))
     }
