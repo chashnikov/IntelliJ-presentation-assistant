@@ -50,6 +50,7 @@ class PresentationAssistantState {
     var alternativeKeymap = getDefaultAlternativeKeymap()
     var horizontalAlignment = PopupHorizontalAlignment.CENTER
     var verticalAlignment = PopupVerticalAlignment.BOTTOM
+    var margin = 5
 }
 
 enum class PopupHorizontalAlignment { LEFT, CENTER, RIGHT }
@@ -150,6 +151,8 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
     private val hideDelayField = JTextField(5)
     private val horizontalAlignmentButtons = PopupHorizontalAlignment.values().associate { it to JRadioButton(it.name.toLowerCase().capitalize()) }
     private val verticalAlignmentButtons = PopupVerticalAlignment.values().associate { it to JRadioButton(it.name.toLowerCase().capitalize()) }
+    private val marginField = JTextField(5)
+
     private val mainPanel: JPanel
     init
     {
@@ -171,6 +174,7 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
                            .addLabeledComponent("&Display duration (in ms):", hideDelayField)
                            .addLabeledComponent("Horizontal alignment:", horizontalAlignmentPanel, 0)
                            .addLabeledComponent("Vertical alignment:", verticalAlignmentPanel, 0)
+                           .addLabeledComponent("Margin:", marginField, 0)
                            .addVerticalGap(10)
                            .addLabeledComponent("Main Keymap:", mainKeymapPanel.mainPanel, true)
                            .addLabeledComponent(showAltKeymap, altKeymapPanel.mainPanel, true)
@@ -197,6 +201,7 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
                                 || configuration.configuration.alternativeKeymap != getAlternativeKeymap()
                                 || !horizontalAlignmentButtons[configuration.configuration.horizontalAlignment]!!.isSelected
                                 || !verticalAlignmentButtons[configuration.configuration.verticalAlignment]!!.isSelected
+                                || isDigitsOnly(marginField.text) && (marginField.text != configuration.configuration.margin.toString())
 
     private fun getAlternativeKeymap() = if (showAltKeymap.isSelected) altKeymapPanel.getDescription() else null
 
@@ -207,6 +212,7 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
         configuration.configuration.alternativeKeymap = getAlternativeKeymap()
         configuration.configuration.horizontalAlignment = horizontalAlignmentButtons.entries.find { it.value.isSelected }!!.key
         configuration.configuration.verticalAlignment = verticalAlignmentButtons.entries.find { it.value.isSelected }!!.key
+        configuration.configuration.margin = marginField.text.trim().toInt()
     }
 
     override fun reset() {
@@ -217,6 +223,7 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
         altKeymapPanel.reset(configuration.configuration.alternativeKeymap ?: KeymapDescription("", ""))
         horizontalAlignmentButtons.forEach { value, button -> button.isSelected = configuration.configuration.horizontalAlignment == value }
         verticalAlignmentButtons.forEach { value, button -> button.isSelected = configuration.configuration.verticalAlignment == value }
+        marginField.text = configuration.configuration.margin.toString()
         updatePanels()
     }
 
