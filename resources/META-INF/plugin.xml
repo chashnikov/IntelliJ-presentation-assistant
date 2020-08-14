@@ -22,6 +22,10 @@
 
   <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (View | Appearance | Descriptions of Actions) ]]></description>
   <change-notes><![CDATA[
+    <p>1.0.6</p>
+    <ul>
+    <li>Fixed presentation of Windows/Linux shortcuts on Mac (<a href="https://github.com/chashnikov/IntelliJ-presentation-assistant/issues/39">#39</a>).</li>
+    </ul>
     <p>1.0.5</p>
     <ul>
     <li>Margin of hints can be changes in Settings.</li>
