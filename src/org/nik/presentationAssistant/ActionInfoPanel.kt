@@ -32,12 +32,10 @@ import com.intellij.openapi.wm.IdeFrame
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.panels.NonOpaquePanel
-import com.intellij.ui.popup.ComponentPopupBuilderImpl
 import com.intellij.util.Alarm
 import com.intellij.util.ui.Animator
 import com.intellij.util.ui.UIUtil
 import java.awt.*
-import java.util.*
 import javax.swing.*
 
 class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>) : NonOpaquePanel(BorderLayout()), Disposable {
@@ -60,7 +58,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         border = emptyBorder
 
 
-        hint = with (JBPopupFactory.getInstance().createComponentPopupBuilder(this, this) as ComponentPopupBuilderImpl) {
+        hint = with(JBPopupFactory.getInstance().createComponentPopupBuilder(this, this)) {
             setAlpha(1.0.toFloat())
             setFocusable(false)
             setBelongsToGlobalPopupStack(false)
