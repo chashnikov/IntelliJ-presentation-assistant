@@ -145,9 +145,37 @@ class ShortcutPresenter : Disposable {
         }
     }
 
+    private fun customShortcut(actionId: String, kind: KeymapKind): Array<KeyboardShortcut> {
+        fun shortcutForCloneCaret(keyCode: Int): Array<KeyboardShortcut> {
+            val modifierCode = when (kind) {
+                KeymapKind.MAC -> KeyEvent.VK_ALT
+                KeymapKind.WIN -> KeyEvent.VK_CONTROL
+            }
+            val modifierMask = when (kind) {
+                KeymapKind.MAC -> KeyEvent.ALT_DOWN_MASK
+                KeymapKind.WIN -> KeyEvent.CTRL_DOWN_MASK
+            }
+            return arrayOf(
+                KeyboardShortcut(
+                    KeyStroke.getKeyStroke(modifierCode, 0),
+                    KeyStroke.getKeyStroke(keyCode, modifierMask)
+                )
+            )
+        }
+
+        return when (actionId) {
+            IdeActions.ACTION_EDITOR_CLONE_CARET_BELOW -> shortcutForCloneCaret(KeyEvent.VK_DOWN)
+            IdeActions.ACTION_EDITOR_CLONE_CARET_ABOVE -> shortcutForCloneCaret(KeyEvent.VK_UP)
+            else -> emptyArray()
+        }
+    }
+
     private fun shortcutTextFragments(keymap: KeymapDescription, actionId: String, shownShortcut: String): List<Pair<String, Font?>> {
         val fragments = ArrayList<Pair<String, Font?>>()
-        val shortcutText = shortcutText(keymap.getKeymap()?.getShortcuts(actionId), keymap.getKind())
+        val shortcuts = keymap.getKeymap()?.getShortcuts(actionId)?.let {
+            if (it.isNotEmpty()) it else customShortcut(actionId, keymap.getKind())
+        }
+        val shortcutText = shortcutText(shortcuts, keymap.getKind())
         if (shortcutText.isEmpty() || shortcutText == shownShortcut) return fragments
 
         when {
@@ -158,7 +186,7 @@ class ShortcutPresenter : Disposable {
                 fragments.add(Pair(shortcutText, macKeyStrokesFont))
             }
             else -> {
-                val altShortcutAsWin = shortcutText(keymap.getKeymap()?.getShortcuts(actionId), KeymapKind.WIN)
+                val altShortcutAsWin = shortcutText(shortcuts, KeymapKind.WIN)
                 if (altShortcutAsWin.isNotEmpty() && shownShortcut != altShortcutAsWin) {
                     fragments.addText(altShortcutAsWin)
                 }
@@ -171,7 +199,7 @@ class ShortcutPresenter : Disposable {
         return fragments
     }
 
-    private fun shortcutText(shortcuts: Array<Shortcut>?, keymapKind: KeymapKind) =
+    private fun shortcutText(shortcuts: Array<out Shortcut>?, keymapKind: KeymapKind) =
         when {
             shortcuts == null || shortcuts.isEmpty() -> ""
             else -> shortcutText(shortcuts[0], keymapKind)
@@ -185,7 +213,10 @@ class ShortcutPresenter : Disposable {
 
     private fun shortcutText(keystroke: KeyStroke, keymapKind: KeymapKind) =
         when (keymapKind) {
-            KeymapKind.MAC -> MacKeymapUtil.getKeyStrokeText(keystroke)
+            KeymapKind.MAC -> {
+                if (keystroke.modifiers == 0 && keystroke.keyCode == KeyEvent.VK_ALT) MacKeymapUtil.OPTION
+                else MacKeymapUtil.getKeyStrokeText(keystroke)
+            }
             KeymapKind.WIN -> {
                 val modifiers = keystroke.modifiers
                 val tokens = arrayOf(
