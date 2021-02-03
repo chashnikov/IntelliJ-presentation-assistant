@@ -1,17 +1,6 @@
-buildscript {
-    ext.kotlin_version = kotlinVersion
-    repositories {
-        jcenter()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
 plugins {
     id 'org.jetbrains.intellij' version "0.4.15"
+    id 'org.jetbrains.kotlin.jvm' version '1.3.61'
 }
 
 repositories {
@@ -19,47 +8,34 @@ repositories {
     mavenCentral()
 }
 
-allprojects {
-    apply plugin: 'java'
-    apply plugin: 'kotlin'
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
 
-    sourceSets {
-        main {
-            java.srcDirs 'src'
-            kotlin.srcDirs 'src'
-            resources.srcDir 'resources'
-        }
-    }
-
-    dependencies {
-        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    }
-
-    apply plugin: 'org.jetbrains.intellij'
-    intellij {
-        version ideaVersion
-        pluginName 'Presentation Assistant'
-        updateSinceUntilBuild false
-        publishPlugin {
-            username publishUsername
-            password publishPassword
-        }
-    }
-
-    compileKotlin {
-        kotlinOptions {
-            freeCompilerArgs += ["-Xjvm-default=enable"]
-        }
+sourceSets {
+    main {
+        java.srcDirs 'src'
+        kotlin.srcDirs 'src'
+        resources.srcDir 'resources'
     }
 }
 
-apply plugin: 'idea'
-idea {
-    project {
-        jdkName = javaVersion
-        languageLevel = javaVersion
-        vcs = 'Git'
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+}
+
+apply plugin: 'org.jetbrains.intellij'
+intellij {
+    version ideaVersion
+    pluginName 'Presentation Assistant'
+    updateSinceUntilBuild false
+    publishPlugin {
+        username publishUsername
+        password publishPassword
+    }
+}
+
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs += ["-Xjvm-default=enable"]
     }
 }
