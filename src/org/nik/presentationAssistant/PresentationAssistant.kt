@@ -22,11 +22,14 @@ package org.nik.presentationAssistant
 import com.intellij.ide.AppLifecycleListener
 import com.intellij.ide.plugins.DynamicPluginListener
 import com.intellij.ide.plugins.IdeaPluginDescriptor
+import com.intellij.ide.plugins.PluginManager
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.keymap.Keymap
 import com.intellij.openapi.keymap.KeymapManager
 import com.intellij.openapi.keymap.ex.KeymapManagerEx
@@ -59,6 +62,7 @@ enum class PopupVerticalAlignment { TOP, BOTTOM }
 @State(name = "PresentationAssistant", storages = arrayOf(Storage(file = "presentation-assistant.xml")))
 class PresentationAssistant : PersistentStateComponent<PresentationAssistantState>, Disposable {
     val configuration = PresentationAssistantState()
+    var warningAboutMacKeymapWasShown = false
     private var presenter: ShortcutPresenter? = null
 
     override fun getState() = configuration
@@ -87,6 +91,23 @@ class PresentationAssistant : PersistentStateComponent<PresentationAssistantStat
             presenter?.disable()
             presenter = null
         }
+    }
+
+    fun checkIfMacKeymapIsAvailable() {
+        val alternativeKeymap = configuration.alternativeKeymap
+        if (warningAboutMacKeymapWasShown || getCurrentOSKind() == KeymapKind.MAC || alternativeKeymap == null) {
+            return
+        }
+        if (alternativeKeymap.displayText != "for Mac" || alternativeKeymap.getKeymap() != null) {
+            return
+        }
+
+        val pluginId = PluginId.getId("com.intellij.plugins.macoskeymap")
+        val plugin = PluginManagerCore.getPlugin(pluginId)
+        if (plugin != null && plugin.isEnabled) return
+
+        warningAboutMacKeymapWasShown = true
+        showInstallMacKeymapPluginNotification(pluginId)
     }
 
     fun setFontSize(value: Int) {

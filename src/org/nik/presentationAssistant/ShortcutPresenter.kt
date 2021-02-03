@@ -141,6 +141,7 @@ class ShortcutPresenter : Disposable {
                 infoPanel!!.updateText(realProject, fragments)
             }
         }
+        getPresentationAssistant().checkIfMacKeymapIsAvailable()
     }
 
     private fun getCustomShortcut(actionId: String, kind: KeymapKind): Array<KeyboardShortcut> {

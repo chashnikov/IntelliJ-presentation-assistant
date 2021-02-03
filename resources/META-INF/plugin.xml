@@ -18,10 +18,14 @@
   <id>org.nik.presentation-assistant</id>
   <name>Presentation Assistant</name>
   <vendor>Nikolay Chashnikov</vendor>
-  <idea-version since-build="193.5233"/>
+  <idea-version since-build="201.8743"/>
 
   <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (View | Appearance | Descriptions of Actions) ]]></description>
   <change-notes><![CDATA[
+    <p>1.0.9</p>
+    <ul>
+    <li>Suggests to automatically install 'macOS Keymap' plugin to show Mac shortcuts.</li>
+    </ul>
     <p>1.0.8</p>
     <ul>
     <li>Show shortcuts for Clone Caret Below/Above actions (<a href="https://github.com/chashnikov/IntelliJ-presentation-assistant/issues/45">#45</a>).</li>
