@@ -36,8 +36,8 @@ class ActionInfoColorSettings : ColorSettingsPage, DisplayPrioritySortable {
     override fun getDisplayName() = "Presentation Assistant"
     override fun getColorDescriptors(): Array<ColorDescriptor> {
         return arrayOf(
-                ColorDescriptor("Hint foreground", FOREGROUND_COLOR_KEY, ColorDescriptor.Kind.FOREGROUND),
-                ColorDescriptor("Hint background", BACKGROUND_COLOR_KEY, ColorDescriptor.Kind.BACKGROUND)
+                ColorDescriptor("Hint Foreground", FOREGROUND_COLOR_KEY, ColorDescriptor.Kind.FOREGROUND),
+                ColorDescriptor("Hint Background", BACKGROUND_COLOR_KEY, ColorDescriptor.Kind.BACKGROUND)
         )
     }
 

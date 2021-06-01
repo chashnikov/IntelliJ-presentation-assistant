@@ -22,7 +22,6 @@ package org.nik.presentationAssistant
 import com.intellij.ide.AppLifecycleListener
 import com.intellij.ide.plugins.DynamicPluginListener
 import com.intellij.ide.plugins.IdeaPluginDescriptor
-import com.intellij.ide.plugins.PluginManager
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.PersistentStateComponent
@@ -59,7 +58,7 @@ class PresentationAssistantState {
 enum class PopupHorizontalAlignment { LEFT, CENTER, RIGHT }
 enum class PopupVerticalAlignment { TOP, BOTTOM }
 
-@State(name = "PresentationAssistant", storages = arrayOf(Storage(file = "presentation-assistant.xml")))
+@State(name = "PresentationAssistant", storages = [Storage(file = "presentation-assistant.xml")])
 class PresentationAssistant : PersistentStateComponent<PresentationAssistantState>, Disposable {
     val configuration = PresentationAssistantState()
     var warningAboutMacKeymapWasShown = false
@@ -170,8 +169,8 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
     private val altKeymapPanel = KeymapDescriptionPanel()
     private val fontSizeField = JTextField(5)
     private val hideDelayField = JTextField(5)
-    private val horizontalAlignmentButtons = PopupHorizontalAlignment.values().associate { it to JRadioButton(it.name.toLowerCase().capitalize()) }
-    private val verticalAlignmentButtons = PopupVerticalAlignment.values().associate { it to JRadioButton(it.name.toLowerCase().capitalize()) }
+    private val horizontalAlignmentButtons = PopupHorizontalAlignment.values().associateWith { JRadioButton(it.name.toLowerCase().capitalize()) }
+    private val verticalAlignmentButtons = PopupVerticalAlignment.values().associateWith { JRadioButton(it.name.toLowerCase().capitalize()) }
     private val marginField = JTextField(5)
 
     private val mainPanel: JPanel
@@ -211,9 +210,9 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
     }
 
     override fun getId() = displayName
-    override fun enableSearch(option: String?) = null
+    override fun enableSearch(option: String?): Runnable? = null
     override fun getDisplayName() = "Presentation Assistant"
-    override fun getHelpTopic() = null
+    override fun getHelpTopic(): String? = null
 
     override fun createComponent() = mainPanel
     override fun isModified() = isDigitsOnly(fontSizeField.text) && (fontSizeField.text != configuration.configuration.fontSize.toString())
@@ -242,8 +241,8 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
         showAltKeymap.isSelected = configuration.configuration.alternativeKeymap != null
         mainKeymapPanel.reset(configuration.configuration.mainKeymap)
         altKeymapPanel.reset(configuration.configuration.alternativeKeymap ?: KeymapDescription("", ""))
-        horizontalAlignmentButtons.forEach { value, button -> button.isSelected = configuration.configuration.horizontalAlignment == value }
-        verticalAlignmentButtons.forEach { value, button -> button.isSelected = configuration.configuration.verticalAlignment == value }
+        horizontalAlignmentButtons.forEach { (value, button) -> button.isSelected = configuration.configuration.horizontalAlignment == value }
+        verticalAlignmentButtons.forEach { (value, button) -> button.isSelected = configuration.configuration.verticalAlignment == value }
         marginField.text = configuration.configuration.margin.toString()
         updatePanels()
     }

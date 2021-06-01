@@ -27,7 +27,7 @@ import java.awt.GraphicsEnvironment
 private val LOG = Logger.getInstance("presentationAssistant.MacKeyStrokePresentation")
 
 val macKeyStrokesFont by lazy {
-    val font = GraphicsEnvironment.getLocalGraphicsEnvironment().allFonts.minBy { getNonDisplayableMacSymbols(it).size }
+    val font = GraphicsEnvironment.getLocalGraphicsEnvironment().allFonts.minByOrNull { getNonDisplayableMacSymbols(it).size }
     if (font != null) {
         val macSymbols = getNonDisplayableMacSymbols(font)
         if (macSymbols.isNotEmpty()) {

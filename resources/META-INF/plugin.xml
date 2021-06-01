@@ -18,7 +18,7 @@
   <id>org.nik.presentation-assistant</id>
   <name>Presentation Assistant</name>
   <vendor>Nikolay Chashnikov</vendor>
-  <idea-version since-build="201.8743"/>
+  <idea-version since-build="211.0"/>
 
   <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (View | Appearance | Descriptions of Actions) ]]></description>
   <change-notes><![CDATA[
@@ -74,6 +74,7 @@
       <applicationService serviceImplementation="org.nik.presentationAssistant.PresentationAssistant"/>
       <applicationConfigurable groupId="appearance" groupWeight="-15" instance="org.nik.presentationAssistant.PresentationAssistantConfigurable"/>
       <colorSettingsPage implementation="org.nik.presentationAssistant.ActionInfoColorSettings"/>
+      <notificationGroup displayType="BALLOON" id="Presentation Assistant"/>
   </extensions>
   <actions>
     <action class="org.nik.presentationAssistant.ShowActionDescriptionsToggleAction"

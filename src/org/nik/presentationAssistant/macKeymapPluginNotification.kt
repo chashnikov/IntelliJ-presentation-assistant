@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.updateSettings.impl.pluginsAdvertisement.PluginsAdvertiser
-import com.intellij.openapi.util.EmptyRunnable
 
 fun showInstallMacKeymapPluginNotification(pluginId: PluginId) {
     val title = "Shortcuts for macOS are not shown"
