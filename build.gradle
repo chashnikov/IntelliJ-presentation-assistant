@@ -1,10 +1,9 @@
 plugins {
-    id 'org.jetbrains.intellij' version "0.4.15"
+    id 'org.jetbrains.intellij' version "1.0"
     id 'org.jetbrains.kotlin.jvm' version '1.3.61'
 }
 
 repositories {
-    jcenter()
     mavenCentral()
 }
 
@@ -25,13 +24,9 @@ dependencies {
 
 apply plugin: 'org.jetbrains.intellij'
 intellij {
-    version ideaVersion
-    pluginName 'Presentation Assistant'
-    updateSinceUntilBuild false
-    publishPlugin {
-        username publishUsername
-        password publishPassword
-    }
+    version = ideaVersion
+    pluginName = 'Presentation Assistant'
+    updateSinceUntilBuild = false
 }
 
 compileKotlin {
