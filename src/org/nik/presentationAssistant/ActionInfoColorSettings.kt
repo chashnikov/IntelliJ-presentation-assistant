@@ -41,7 +41,7 @@ class ActionInfoColorSettings : ColorSettingsPage, DisplayPrioritySortable {
         )
     }
 
-    override fun getPriority() = DisplayPriority.GENERAL_SETTINGS
+    override fun getPriority() = DisplayPriority.COMMON_SETTINGS
 
     override fun getIcon() = null
     override fun getDemoText() = " "
