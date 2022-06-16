@@ -129,9 +129,9 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
         if (getHintWindow() == null) return
         labelsPanel.removeAll()
         updateLabelText(project, textFragments)
-        hint.content.invalidate()
         hint.setLocation(computeLocation(project).screenPoint)
         hint.size = preferredSize
+        hint.content.validate()
         hint.content.repaint()
         showFinal()
     }
