@@ -21,7 +21,7 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.extensions.PluginId
-import com.intellij.openapi.updateSettings.impl.pluginsAdvertisement.PluginsAdvertiser
+import com.intellij.openapi.updateSettings.impl.pluginsAdvertisement.installAndEnable
 
 fun showInstallMacKeymapPluginNotification(pluginId: PluginId) {
     val title = "Shortcuts for macOS are not shown"
@@ -29,7 +29,7 @@ fun showInstallMacKeymapPluginNotification(pluginId: PluginId) {
     val notification = Notification("Presentation Assistant", title, content, NotificationType.INFORMATION)
     notification.addAction(object : AnAction("Install Plugin") {
         override fun actionPerformed(e: AnActionEvent) {
-            PluginsAdvertiser.installAndEnable(null, setOf(pluginId), false) { notification.expire() }
+            installAndEnable(null, setOf(pluginId), false) { notification.expire() }
         }
     })
     notification.addAction(object : AnAction("Do Not Show macOS Shortcuts") {

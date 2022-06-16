@@ -188,7 +188,7 @@ class ActionInfoPanel(project: Project, textFragments: List<Pair<String, Font?>>
             for (label in labels) {
                 label.font = label.font.deriveFont(size)
             }
-            val maxAscent = labels.map { it.getFontMetrics(it.font).maxAscent }.maxOrNull() ?: 0
+            val maxAscent = labels.maxOfOrNull { it.getFontMetrics(it.font).maxAscent } ?: 0
             for (label in labels) {
                 val ascent = label.getFontMetrics(label.font).maxAscent
                 if (ascent < maxAscent) {

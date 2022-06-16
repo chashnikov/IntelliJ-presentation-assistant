@@ -24,8 +24,8 @@ import com.intellij.ide.plugins.DynamicPluginListener
 import com.intellij.ide.plugins.IdeaPluginDescriptor
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.extensions.PluginId
@@ -55,8 +55,8 @@ class PresentationAssistantState {
     var margin = 5
 }
 
-enum class PopupHorizontalAlignment { LEFT, CENTER, RIGHT }
-enum class PopupVerticalAlignment { TOP, BOTTOM }
+enum class PopupHorizontalAlignment(val displayName: String) { LEFT("Left"), CENTER("Center"), RIGHT("Right") }
+enum class PopupVerticalAlignment(val displayName: String) { TOP("Top"), BOTTOM("Bottom") }
 
 @State(name = "PresentationAssistant", storages = [Storage(file = "presentation-assistant.xml")])
 class PresentationAssistant : PersistentStateComponent<PresentationAssistantState>, Disposable {
@@ -118,7 +118,7 @@ class PresentationAssistant : PersistentStateComponent<PresentationAssistantStat
     }
 }
 
-fun getPresentationAssistant(): PresentationAssistant = ServiceManager.getService(PresentationAssistant::class.java)
+fun getPresentationAssistant(): PresentationAssistant = ApplicationManager.getApplication().getService(PresentationAssistant::class.java)
 
 class PresentationAssistantListenerRegistrar : AppLifecycleListener, DynamicPluginListener {
     override fun appFrameCreated(commandLineArgs: MutableList<String>) {
@@ -169,8 +169,8 @@ class PresentationAssistantConfigurable : Configurable, SearchableConfigurable {
     private val altKeymapPanel = KeymapDescriptionPanel()
     private val fontSizeField = JTextField(5)
     private val hideDelayField = JTextField(5)
-    private val horizontalAlignmentButtons = PopupHorizontalAlignment.values().associateWith { JRadioButton(it.name.toLowerCase().capitalize()) }
-    private val verticalAlignmentButtons = PopupVerticalAlignment.values().associateWith { JRadioButton(it.name.toLowerCase().capitalize()) }
+    private val horizontalAlignmentButtons = PopupHorizontalAlignment.values().associateWith { JRadioButton(it.displayName) }
+    private val verticalAlignmentButtons = PopupVerticalAlignment.values().associateWith { JRadioButton(it.displayName) }
     private val marginField = JTextField(5)
 
     private val mainPanel: JPanel

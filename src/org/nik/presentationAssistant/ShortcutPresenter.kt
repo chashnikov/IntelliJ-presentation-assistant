@@ -57,7 +57,7 @@ class ShortcutPresenter : Disposable {
 
     private fun enable() {
         ApplicationManager.getApplication().messageBus.connect(this).subscribe(AnActionListener.TOPIC, object: AnActionListener {
-            override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
+            override fun beforeActionPerformed(action: AnAction, event: AnActionEvent) {
                 val actionId = ActionManager.getInstance().getId(action) ?: return
 
                 if (!movingActions.contains(actionId) && !typingActions.contains(actionId)) {
