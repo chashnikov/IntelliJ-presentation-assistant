@@ -20,7 +20,7 @@
   <vendor>Nikolay Chashnikov</vendor>
   <idea-version since-build="221.0"/>
 
-  <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (View | Appearance | Descriptions of Actions) ]]></description>
+  <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke. To enable it, make sure View > Appearance > Descriptions of Actions is ticked in the menu.]]></description>
   <change-notes><![CDATA[
     <p>1.0.10</p>
     <ul>
