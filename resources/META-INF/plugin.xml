@@ -16,12 +16,22 @@
 
 <idea-plugin>
   <id>org.nik.presentation-assistant</id>
-  <name>Presentation Assistant</name>
+  <name>Presentation Assistant for 2023.2</name>
   <vendor>Nikolay Chashnikov</vendor>
-  <idea-version since-build="221.0"/>
+  <idea-version since-build="221.0" until-build="232.*"/>
 
-  <description><![CDATA[This plugin shows name and Win/Mac shortcuts of any action you invoke (View | Appearance | Descriptions of Actions) ]]></description>
+  <description><![CDATA[
+  Adds an option to show name and shortcuts of any action you invoke (View | Appearance | Descriptions of Actions) in
+  IntelliJ-based IDEs of version 2023.2 and older.
+  <br/>
+  Since version 2023.3, this functionality <a href="https://www.jetbrains.com/help/idea/presentation-assistant.html">is provided</a> by IntelliJ Platform, so it's available in all IntelliJ-based
+  IDEs out of the box, see Settings | Appearance & Behavior | Presentation Assistant.   
+]]></description>
   <change-notes><![CDATA[
+    <p>1.0.11</p>
+    <ul>
+    <li>Update description to mention that the plugin is not needed in IDEs of version 2023.3 or newer.</li>
+    </ul>
     <p>1.0.10</p>
     <ul>
     <li>Fix problem with showing shortcut for repeatedly invoked action (<a href="https://github.com/chashnikov/IntelliJ-presentation-assistant/issues/54">#54</a>).</li>

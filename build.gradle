@@ -25,7 +25,6 @@ dependencies {
 apply plugin: 'org.jetbrains.intellij'
 intellij {
     version = ideaVersion
-    pluginName = 'Presentation Assistant'
     updateSinceUntilBuild = false
 }
 
